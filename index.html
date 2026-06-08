@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ביוטכנולוגיה — מרכז הממשקים</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #050505;
+            color: #e5e5e5;
+            background-image: radial-gradient(circle at 50% -10%, #1a1a2e 0%, #050505 65%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <!--
+    =======================================================================
+      ✏️  עריכת הקישורים — זה כל מה שצריך לגעת בו
+    =======================================================================
+      כל שורה = כרטיס אחד. לערוך טקסט? פשוט שנה את הערכים בין הגרשיים.
+        title  : השם שמופיע על הכרטיס
+        desc   : תיאור קצר מתחת לשם
+        file   : שם קובץ ה-HTML (השאר ריק ""  ⟵  כרטיס "בקרוב", לא לחיץ)
+        icon   : אימוג'י
+        color  : צבע ההילה (tailwind gradient) — אפשר להשאיר כמו שהוא
+      להוסיף כרטיס חדש? שכפל שורה. למחוק? מחק שורה.
+    =======================================================================
+    -->
+    <script>
+    const LINKS = [
+        { title: "מעבדה 0",                    desc: "בקרוב — בהכנה",                          file: "Lab0.html",    icon: "🧫", color: "from-slate-500 to-slate-400" },
+        { title: "המעבדה הווירטואלית",         desc: "סימולציית מעבדה אינטראקטיבית בביוטכנולוגיה", file: "Lab1.html",    icon: "🧪", color: "from-cyan-500 to-blue-500" },
+        { title: "מאגר שאלות מעבדה",           desc: "שאלות, גרפים וניתוח נתונים כמותי",        file: "Lab2.html",    icon: "📊", color: "from-blue-600 to-indigo-500" },
+        { title: "מעבדה 3",                    desc: "בקרוב — בהכנה",                          file: "Lab3.html",    icon: "🔬", color: "from-slate-500 to-slate-400" },
+        { title: "מעבדה 4",                    desc: "בקרוב — בהכנה",                          file: "Lab4.html",    icon: "🧬", color: "from-slate-500 to-slate-400" },
+        { title: "מעבדת חקירה בסטטיסטיקה",     desc: "פרדוקס סימפסון · P-Hacking · בית משפט לגרפים", file: "Stats1.html",  icon: "🔎", color: "from-emerald-500 to-teal-400" },
+        { title: "חדר הבקרה הסטטיסטי",         desc: "סימולטור FDA · אפקט הביליונר · ארכיטקט המחקר", file: "Stats2.html",  icon: "⚖️", color: "from-purple-600 to-pink-500" },
+        { title: "מערכת הערכת פרזנטציות",      desc: "כלי שיפוט והערכה לפרזנטציות בביוטכנולוגיה",  file: "GradeME.html", icon: "🏆", color: "from-amber-500 to-orange-500" },
+    ];
+    </script>
+    <!-- =================  סוף אזור העריכה  ================= -->
+
+    <div id="root" class="max-w-6xl mx-auto px-6 py-12 md:py-20"></div>
+
+    <script>
+        const root = document.getElementById('root');
+
+        // Header
+        root.innerHTML = `
+            <header class="text-center mb-16 animate-fade-in">
+                <div class="text-5xl mb-4">🧬</div>
+                <h1 class="text-5xl md:text-6xl font-black mb-4 tracking-tight">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500">
+                        מרכז הממשקים — ביוטכנולוגיה
+                    </span>
+                </h1>
+                <p class="text-xl md:text-2xl text-slate-400 font-light">כל המעבדות והכלים האינטראקטיביים במקום אחד</p>
+            </header>
+            <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7"></div>
+            <footer class="text-center mt-20 text-slate-600 text-sm animate-fade-in" style="animation-delay:0.5s">
+                <p>פרויקט ביוטכנולוגיה · מתעדכן באופן שוטף</p>
+            </footer>
+        `;
+
+        const grid = document.getElementById('grid');
+
+        LINKS.forEach((link, i) => {
+            const ready = link.file && link.file.trim() !== "";
+            const card = document.createElement(ready ? 'a' : 'div');
+            if (ready) { card.href = link.file; }
+
+            card.className = `glass-card p-8 rounded-3xl block relative overflow-hidden group animate-fade-in transition-all duration-500
+                ${ready ? 'cursor-pointer hover:-translate-y-2 hover:shadow-2xl' : 'opacity-50 cursor-not-allowed'}`;
+            card.style.animationDelay = `${0.05 * i + 0.1}s`;
+
+            card.innerHTML = `
+                <div class="absolute inset-0 bg-gradient-to-br ${link.color} opacity-0 ${ready ? 'group-hover:opacity-10' : ''} transition-opacity duration-500"></div>
+                ${ready ? '' : '<div class="absolute top-4 left-4 text-xs font-bold tracking-widest uppercase bg-slate-700/70 text-slate-300 px-3 py-1 rounded-full">בקרוב</div>'}
+                <div class="text-6xl mb-5 ${ready ? 'group-hover:scale-110' : ''} transition-transform duration-500 origin-bottom-right">${link.icon}</div>
+                <h2 class="text-2xl font-bold mb-2">${link.title}</h2>
+                <p class="text-slate-400 leading-relaxed">${link.desc}</p>
+                ${ready ? `<div class="mt-6 flex items-center text-sm font-bold tracking-widest uppercase text-slate-500 group-hover:text-white transition-colors">
+                    כניסה <span class="mr-2">←</span>
+                </div>` : ''}
+            `;
+            grid.appendChild(card);
+        });
+    </script>
+</body>
+</html>

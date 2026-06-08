@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת הערכת פרזנטציות - ביוטכנולוגיה</title>
+    <!-- Tailwind CSS for modern adaptive layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Assistant for Hebrew and Inter for Latin/Numbers -->
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons for premium visual feeling -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Assistant', sans-serif;
+        }
+        .mono-font {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for beautiful dashboard aesthetics */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+
+    <!-- Navigation Bar -->
+    <header class="bg-emerald-900 text-white shadow-lg border-b border-emerald-800 sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-emerald-800 rounded-xl border border-emerald-700 shadow-inner">
+                    <i data-lucide="beaker" class="w-8 h-8 text-emerald-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">הערכת מחקר בביוטכנולוגיה</h1>
+                    <p class="text-xs text-emerald-200 mt-0.5">על פי מסמך ההנחיות: <span class="underline font-semibold">משימת הצגת מחקר_2.docx</span></p>
+                </div>
+            </div>
+            
+            <!-- Interface View Switcher (Teacher vs Student) -->
+            <div class="flex bg-emerald-950/60 p-1.5 rounded-xl border border-emerald-700/50">
+                <button onclick="switchView('teacher')" id="tab-teacher" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-emerald-500 text-white shadow">
+                    <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                    ממשק מורה ומנהל
+                </button>
+                <button onclick="switchView('student')" id="tab-student" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 text-emerald-300 hover:text-white">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    ממשק הגשת תלמיד (עמיתים)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        
+        <!-- Guidelines Toggle Banner (Always accessible) -->
+        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 mb-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
+            <div class="flex items-start gap-3">
+                <div class="p-2 bg-emerald-100 rounded-lg text-emerald-800 mt-1">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-emerald-900 text-base">הנחיות מתוך "משימת הצגת מחקר_2.docx"</h3>
+                    <p class="text-sm text-emerald-700 mt-1 leading-relaxed">
+                        הצגה בת 7-10 דק' + 2-3 דק' שאלות. <strong>זהירות מדעית:</strong> אין להציג מסקנות סופיות לגבי ביטוי גנים (RNA) שעדיין לא נמדד, אלא רק מסקנות ביניים לגבי תגובת הקסניה.
+                    </p>
+                </div>
+            </div>
+            <button onclick="toggleGuidelines()" class="px-4 py-2 bg-white hover:bg-emerald-100/50 border border-emerald-300 text-emerald-800 rounded-xl text-xs font-bold transition flex items-center gap-1.5 self-start md:self-center shadow-xs">
+                <i data-lucide="presentation" class="w-4 h-4"></i>
+                <span id="btn-guidelines-text">הצג מבנה מצגת (10 שקופיות) ודגשים</span>
+            </button>
+        </div>
+
+        <!-- Collapsible Presentation Structure and Warnings Section -->
+        <div id="guidelines-panel" class="hidden bg-white border border-slate-200 rounded-2xl p-5 mb-6 shadow-sm transition-all duration-300 no-print">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
+                <h4 class="font-extrabold text-slate-800 flex items-center gap-2 text-base">
+                    <i data-lucide="info" class="text-emerald-600"></i>
+                    מבנה המצגת המומלץ ודגשים מדעיים חשובים
+                </h4>
+                <button onclick="toggleGuidelines()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs leading-relaxed text-slate-600">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span class="font-bold text-emerald-800 block mb-1">שקופית 1-3: רקע ומערכת</span>
+                    שם הניסוי, חברי הקבוצה. רקע על הקסניה, הגורם הנבדק והתהליכים הביולוגיים המעורבים ללא עומס טקסט.
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span class="font-bold text-emerald-800 block mb-1">שקופית 4: שאלת מחקר והשערה</span>
+                    הגדרה ברורה של משתנה תלוי/בלתי תלוי, קבוצת ביקורת, והשערה מנומקת ביולוגית (לא ניחוש בעלמא).
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span class="font-bold text-emerald-800 block mb-1">שקופיות 5-6: מהלך ושיטות</span>
+                    מערכת הניסוי בפועל, טיפולים, חזרות, אופן המדידה, שמירה על תנאים קבועים, ומגבלות הניסוי.
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span class="font-bold text-emerald-800 block mb-1">שקופיות 7-8: תוצאות חלקיות</span>
+                    גרף/טבלה מסודרים (צירים, יחידות, מגמה). <strong>חובה לציין:</strong> ביטוי ה-RNA טרם נמדד ולכן אין להסיק לגביו.
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span class="font-bold text-emerald-800 block mb-1">שקופית 9-10: דיון ושאלה לקהל</span>
+                    מסקנות ביניים בלבד, הצעות לשיפור הניסוי, ושאלה אתגרית לכיתה (לתרגול מעורבות והקשבה).
+                </div>
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900">
+                    <span class="font-bold block mb-1">⚠️ זהירות מדעית (לא לומר "הוכחנו"!)</span>
+                    להשתמש במונחים זהירים: "התוצאות מצביעות על...", "נראה כי...", "ייתכן ש...", "בשלב זה אי אפשר לקבוע בוודאות...".
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: TEACHER -->
+        <div id="view-teacher" class="space-y-6">
+            
+            <!-- Connection Status Banner -->
+            <div id="connection-status-banner" class="bg-slate-800 text-slate-300 text-xs px-4 py-2 rounded-xl flex items-center justify-between no-print shadow-inner border border-slate-700">
+                <span class="flex items-center gap-1.5 font-bold text-emerald-400">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+                    מערכת סנכרון ענן (Firestore) וזכרון מקומי מנוהלת בזמן אמת
+                </span>
+                <span id="firebase-state-txt" class="text-slate-400">טוען חיבור...</span>
+            </div>
+
+            <!-- Teacher Administration Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
+                <!-- Create/Edit Group Card -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="text-emerald-600"></i>
+                            ניהול קבוצות ותלמידים
+                        </h2>
+                        <p class="text-xs text-slate-500 mb-4">הוסף קבוצה חדשה והזן את שמות התלמידים בנפרד.</p>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">שם הקבוצה</label>
+                                <input type="text" id="new-group-name" placeholder="לדוגמה: קבוצה 1 - השפעת מלח" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">נושא המחקר</label>
+                                <input type="text" id="new-group-topic" placeholder="לדוגמה: השפעת ריכוז NaCl על כיווץ קסניות" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            
+                            <!-- Dynamic Student List Builder -->
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">הוסף תלמיד לקבוצה:</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="student-name-input" placeholder="שם תלמיד" class="flex-grow px-3 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-none">
+                                    <button type="button" onclick="addStudentToBuilderList()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 rounded-lg text-xs font-bold transition">הוסף</button>
+                                </div>
+                                <div id="builder-students-chips" class="flex flex-wrap gap-1.5 mt-2.5 min-h-[30px] items-center">
+                                    <span class="text-[10px] text-slate-400 italic">טרם נוספו תלמידים</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="createNewGroup()" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-2.5 px-4 rounded-xl shadow transition flex items-center justify-center gap-2">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        שמור והוסף קבוצה
+                    </button>
+                </div>
+
+                <!-- Grading Algorithm Details -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                    <i data-lucide="sliders" class="text-emerald-600"></i>
+                                    אלגוריתם שקלול הציון (80% / 10% / 10%)
+                                </h2>
+                                <p class="text-xs text-slate-500">חישוב לפי הנחיות "משימת הצגת מחקר_2.docx":</p>
+                            </div>
+                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-1 rounded-full">מבוסס קובץ הנחיות</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 my-3">
+                            <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-center">
+                                <div class="text-2xl font-black text-emerald-800">80%</div>
+                                <div class="text-xs font-bold text-emerald-950 mt-1">ציון מחוון מורה קבוצתי</div>
+                                <div class="text-[10px] text-emerald-700 mt-1">ציון הפרזנטציה על פי 7 מדדים</div>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-center">
+                                <div class="text-2xl font-black text-blue-800">10%</div>
+                                <div class="text-xs font-bold text-blue-950 mt-1">ממוצע הערכת עמיתים</div>
+                                <div class="text-[10px] text-blue-700 mt-1">ממוצע דירוגי הכיתה (1-5 כוכבים)</div>
+                            </div>
+                            <div class="bg-purple-50 p-4 rounded-xl border border-purple-100 text-center">
+                                <div class="text-2xl font-black text-purple-800">10%</div>
+                                <div class="text-xs font-bold text-purple-950 mt-1">איכות משוב אינדיבידואלי</div>
+                                <div class="text-[10px] text-purple-700 mt-1">ניתן בנפרד לכל תלמיד על ידי המורה</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+                        <span class="flex items-center gap-1.5 font-semibold">
+                            <i data-lucide="database" class="w-4 h-4 text-emerald-600"></i>
+                            ניהול נתונים כללי
+                        </span>
+                        <div class="flex gap-2">
+                            <button onclick="clearAllData()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-bold transition border border-rose-200">איפוס כל הנתונים</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Grading Area -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden no-print">
+                <div class="p-5 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/50">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="award" class="text-emerald-600"></i>
+                            הזנת ציונים והערכה
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">בחר קבוצה כדי להזין את ציוני המחוון ולערוך את ציוני התלמידים הבודדים בקבוצה.</p>
+                    </div>
+                    <!-- Active group filter dropdown -->
+                    <div class="flex items-center gap-2 w-full md:w-auto">
+                        <label class="text-xs font-bold text-slate-700 whitespace-nowrap">קבוצה פעילה להערכה:</label>
+                        <select id="active-group-select" onchange="changeActiveGroup(this.value)" class="w-full md:w-64 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm font-bold focus:ring-emerald-500 focus:border-emerald-500">
+                            <!-- Loaded Dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-12 divide-y xl:divide-y-0 xl:divide-x xl:divide-x-reverse divide-slate-200">
+                    
+                    <!-- Right/Main Column: 7 Criteria Teacher Form -->
+                    <div class="xl:col-span-7 p-6 space-y-5">
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                            <h3 class="font-extrabold text-slate-800 flex items-center gap-2 text-base">
+                                <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-bold">מחוון מורה קבוצתי (80%)</span>
+                                עבור: <span id="eval-group-title" class="text-emerald-700">בחר קבוצה</span>
+                            </h3>
+                            <div class="text-left">
+                                <span class="text-xs text-slate-500 block">ציון מצגת קבוצתי</span>
+                                <span id="teacher-total-badge" class="text-2xl font-black text-emerald-600 mono-font">0/100</span>
+                            </div>
+                        </div>
+
+                        <!-- 7 Criteria Inputs -->
+                        <div class="space-y-3">
+                            <!-- Criteria 1 -->
+                            <div class="p-3 bg-slate-50 hover:bg-slate-100/70 rounded-xl border border-slate-200/60 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="flex items-start gap-2 max-w-lg">
+                                    <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">1</span>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-slate-800">הבנת הרקע המדעי (15 נק')</h4>
+                                        <p class="text-[11px] text-slate-500">הסבר נכון וברור. קשר לוגי ישיר לשאלת המחקר.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 self-end sm:self-center">
+                                    <input type="number" id="c-bg" min="0" max="15" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 15</span>
+                                </div>
+                            </div>
+
+                            <!-- Criteria 2 -->
+                            <div class="p-3 bg-slate-50 hover:bg-slate-100/70 rounded-xl border border-slate-200/60 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="flex items-start gap-2 max-w-lg">
+                                    <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">2</span>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-slate-800">שאלת מחקר והשערה (15 נק')</h4>
+                                        <p class="text-[11px] text-slate-500">שאלת מחקר ברורה. השערה מנומקת ביולוגית (לא ניחוש).</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 self-end sm:self-center">
+                                    <input type="number" id="c-hypothesis" min="0" max="15" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 15</span>
+                                </div>
+                            </div>
+
+                            <!-- Criteria 3 -->
+                            <div class="p-3 bg-slate-50 hover:bg-slate-100/70 rounded-xl border border-slate-200/60 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="flex items-start gap-2 max-w-lg">
+                                    <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">3</span>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-slate-800">הבנת מהלך הניסוי והשיטות (20 נק')</h4>
+                                        <p class="text-[11px] text-slate-500">הסבר טיפולים, ביקורת, חזרות, מדידות ושמירה על תנאים קבועים.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 self-end sm:self-center">
+                                    <input type="number" id="c-methods" min="0" max="20" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 20</span>
+                                </div>
+                            </div>
+
+                            <!-- Criteria 4 -->
+                            <div class="p-3 bg-slate-50 hover:bg-slate-100/70 rounded-xl border border-slate-200/60 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="flex items-start gap-2 max-w-lg">
+                                    <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">4</span>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-slate-800">הצגת תוצאות חלקיות (20 נק')</h4>
+                                        <p class="text-[11px] text-slate-500">גרף/טבלה מסודרים עם כותרות, צירים ברורים, יחידות והסבר מגמה.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 self-end sm:self-center">
+                                    <input type="number" id="c-results" min="0" max="20" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 20</span>
+                                </div>
+                            </div>
+
+                            <!-- Criteria 5 -->
+                            <div class="p-3 bg-slate-50 hover:bg-slate-100/70 rounded-xl border border-slate-200/60 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="flex items-start gap-2 max-w-lg">
+                                    <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">5</span>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-slate-800">פרשנות מדעית זהירה (15 נק')</h4>
+                                        <p class="text-[11px] text-slate-500">הבחנה בין תוצאה למסקנה. ללא הסקת יתר על RNA שטרם נמדד.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 self-end sm:self-center">
+                                    <input type="number" id="c-caution" min="0" max="15" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 15</span>
+                                </div>
+                            </div>
+
+                            <!-- Criteria 6 -->
+                            <div class="p-3 bg-slate-50 hover:bg-slate-100/70 rounded-xl border border-slate-200/60 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="flex items-start gap-2 max-w-lg">
+                                    <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">6</span>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-slate-800">איכות ההצגה ועמידה בזמנים (10 נק')</h4>
+                                        <p class="text-[11px] text-slate-500">דיבור ברור, שיתוף פעולה, שקופיות נקיות ועמידה בזמנים (7-10 דק').</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 self-end sm:self-center">
+                                    <input type="number" id="c-presentation" min="0" max="10" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 10</span>
+                                </div>
+                            </div>
+
+                            <!-- Criteria 7 -->
+                            <div class="p-3 bg-slate-50 hover:bg-slate-100/70 rounded-xl border border-slate-200/60 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="flex items-start gap-2 max-w-lg">
+                                    <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">7</span>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-slate-800">מענה לשאלות הכיתה והמורה (5 נק')</h4>
+                                        <p class="text-[11px] text-slate-500">מענה ענייני ומקצועי המעיד על הבנת העומק של הניסוי.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 self-end sm:self-center">
+                                    <input type="number" id="c-qna" min="0" max="5" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 5</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Score Banner -->
+                        <div class="flex justify-between items-center bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                            <div>
+                                <h5 class="text-sm font-bold text-emerald-900">שמירה ועדכון ציוני מחוון קבוצתי</h5>
+                                <p class="text-xs text-emerald-700">עדכן את ציוני הקבוצה הנוכחית במערכת.</p>
+                            </div>
+                            <button onclick="saveActiveGroupTeacherScores()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow transition">
+                                שמור ציון מחוון
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Left Column: Individual Student Grading Card & Peer Review Viewer -->
+                    <div class="xl:col-span-5 p-6 space-y-6 bg-slate-50/30">
+                        <!-- Individual Student Grades Board -->
+                        <div>
+                            <h3 class="font-extrabold text-slate-800 flex items-center gap-2 text-sm pb-2 border-b border-slate-100">
+                                <i data-lucide="users" class="text-purple-600"></i>
+                                ציונים אינדיבידואליים לחברי הקבוצה
+                            </h3>
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                ציוני התלמידים מבוססים על: ציון פרזנטציה קבוצתי (90%) + ציון איכות המשוב שלהם (10%) + התאמה/בונוס אישי של המורה.
+                            </p>
+                            
+                            <div id="individual-students-list-container" class="space-y-3 mt-3">
+                                <!-- Loaded dynamically with JS -->
+                                <div class="text-center py-4 text-slate-400 text-xs italic">אנא בחר קבוצה להצגת רשימת התלמידים</div>
+                            </div>
+                        </div>
+
+                        <!-- Received Peer Reviews with Edit options -->
+                        <div class="space-y-3 pt-3 border-t border-slate-200">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-xs font-extrabold text-slate-700 flex items-center gap-1.5 uppercase">
+                                    <i data-lucide="message-square" class="w-4 h-4 text-blue-500"></i>
+                                    משובי עמיתים שהתקבלו בכיתה (<span id="peer-count" class="mono-font">0</span>)
+                                </h4>
+                                <span class="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
+                                    ממוצע דירוג: <span id="peer-avg-stars" class="mono-font">0.0</span> / 5
+                                </span>
+                            </div>
+                            
+                            <!-- Container for student reviews cards -->
+                            <div id="peer-reviews-list" class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                                <!-- Loaded dynamically with JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Class Grade Dashboard Table -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center no-print">
+                    <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="table" class="text-emerald-600"></i>
+                        טבלת ריכוז ציונים כיתתית מחושבת (כולל ציונים אישיים)
+                    </h3>
+                    <button onclick="window.print()" class="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                        <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                        הדפס דוח ציונים כיתתי
+                    </button>
+                </div>
+                <!-- Printable view wrapper -->
+                <div class="p-4 hidden print:block border-b border-slate-200">
+                    <h1 class="text-2xl font-bold text-emerald-900">דוח ריכוז ציונים כיתתי: הערכת מחקר בביוטכנולוגיה</h1>
+                    <p class="text-sm text-slate-500">מבוסס על הנחיות מסמך "משימת הצגת מחקר_2.docx"</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-100/50 text-slate-600 font-bold border-b border-slate-200">
+                                <th class="p-3">שם קבוצה</th>
+                                <th class="p-3">שם התלמיד</th>
+                                <th class="p-3">ציון פרזנטציה (90%)</th>
+                                <th class="p-3">איכות משוב (10%)</th>
+                                <th class="p-3">התאמת מורה אישית</th>
+                                <th class="p-3">הגשות עמיתים</th>
+                                <th class="p-3 text-emerald-800 font-extrabold text-left">ציון סופי משוקלל</th>
+                            </tr>
+                        </thead>
+                        <tbody id="class-scores-table-body" class="divide-y divide-slate-100">
+                            <!-- Populated via script -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: STUDENT -->
+        <div id="view-student" class="hidden space-y-6">
+            
+            <!-- Student Form Banner -->
+            <div class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white rounded-2xl p-6 shadow-xs">
+                <h2 class="text-xl sm:text-2xl font-black mb-1.5 flex items-center gap-2">
+                    <i data-lucide="edit-3" class="text-emerald-300"></i>
+                    טופס הגשת הערכת עמיתים כיתתית
+                </h2>
+                <p class="text-xs sm:text-sm text-emerald-100 max-w-4xl leading-relaxed">
+                    תלמיד/ה יקר/ה, מילוי הערכה זו נועד לעזור לכם לתרגל חשיבה ביקורתית מדעית עניינית. 
+                    <strong>עליך להעריך בדיוק 2 קבוצות שונות</strong> המציגות בכיתה (פרט לקבוצה שלך) כדי להשלים את חובתך.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Checklist and Progress widget -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-extrabold text-slate-900 flex items-center gap-1.5 text-base">
+                        <i data-lucide="list-todo" class="text-emerald-600"></i>
+                        מדריך וכללים להגשה
+                    </h3>
+                    
+                    <ul class="space-y-3 text-xs text-slate-600 leading-relaxed">
+                        <li class="flex items-start gap-2">
+                            <span class="w-4 h-4 bg-emerald-100 text-emerald-800 text-[9px] font-bold rounded-full flex items-center justify-center mt-0.5">1</span>
+                            <span>בחר את <strong>הקבוצה שלך</strong> ולאחר מכן בחר את <strong>שמך המלא</strong> מהרשימה.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="w-4 h-4 bg-emerald-100 text-emerald-800 text-[9px] font-bold rounded-full flex items-center justify-center mt-0.5">2</span>
+                            <span>בחר את <strong>הקבוצה המציגה</strong> ודרג 1-5 כוכבים לכל קריטריון מחוון. (לא ניתן לבחור בקבוצה שלך!).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="w-4 h-4 bg-emerald-100 text-emerald-800 text-[9px] font-bold rounded-full flex items-center justify-center mt-0.5">3</span>
+                            <span>כתוב משוב קצר, מנומק ומדעי בשלוש התיבות (חובה!).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="w-4 h-4 bg-emerald-100 text-emerald-800 text-[9px] font-bold rounded-full flex items-center justify-center mt-0.5">4</span>
+                            <span>לחץ על <strong>שמור והגש משוב</strong> ועבור להגשת הקבוצה השנייה.</span>
+                        </li>
+                    </ul>
+
+                    <!-- Student Name & Group Selection Box -->
+                    <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">הקבוצה שלי (הקבוצה שבה אני חבר):</label>
+                            <select id="student-my-group" onchange="handleMyGroupChange()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <!-- Populated Dynamically -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">שמי המלא (בחר מהרשימה):</label>
+                            <select id="student-my-name-select" onchange="updateStudentProgressWidget()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <option value="">-- בחר תחילה קבוצה --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Live Progress Status -->
+                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-center space-y-3">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-800 block">מצב ההגשות שלך</span>
+                        <div class="flex justify-center items-center gap-1.5 text-emerald-800 font-extrabold text-sm" id="student-progress-text">
+                            טרם בחרת שם סטודנט
+                        </div>
+                        
+                        <!-- PDF Download Button -->
+                        <button id="btn-download-pdf" onclick="exportStudentReviewPDF()" class="hidden w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+                            <i data-lucide="file-down" class="w-4 h-4"></i>
+                            הורד סיכום הגשות ל-PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Core Form Fields -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2 space-y-5">
+                    <h3 class="font-extrabold text-slate-900 flex items-center gap-2 text-base pb-2 border-b border-slate-100">
+                        <i data-lucide="clipboard-list" class="text-emerald-600"></i>
+                        מילוי פרטי הערכת עמיתים
+                    </h3>
+
+                    <!-- Target Group Selection -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">שם הקבוצה המציגה (למעט הקבוצה שלך):</label>
+                        <select id="review-target-group" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <!-- Populated with JS options -->
+                        </select>
+                    </div>
+
+                    <!-- 6 Structured Likert ratings -->
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">דירוג קריטריונים מובנים (1 = חלש מאוד, 5 = מצוין)</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Question 1 -->
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-700">הבנתי מה הייתה שאלת המחקר</span>
+                                <div class="flex items-center gap-1" id="likert-stars-q1">
+                                    <!-- Dynamic Stars -->
+                                </div>
+                            </div>
+
+                            <!-- Question 2 -->
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-700">הרקע המדעי היה ברור</span>
+                                <div class="flex items-center gap-1" id="likert-stars-q2">
+                                    <!-- Dynamic Stars -->
+                                </div>
+                            </div>
+
+                            <!-- Question 3 -->
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-700">הבנתי את מהלך הניסוי והשלבים</span>
+                                <div class="flex items-center gap-1" id="likert-stars-q3">
+                                    <!-- Dynamic Stars -->
+                                </div>
+                            </div>
+
+                            <!-- Question 4 -->
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-700">התוצאות הוצגו בצורה ברורה</span>
+                                <div class="flex items-center gap-1" id="likert-stars-q4">
+                                    <!-- Dynamic Stars -->
+                                </div>
+                            </div>
+
+                            <!-- Question 5 -->
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex justify-between items-center bg-amber-50/40 border-amber-100">
+                                <span class="text-xs font-bold text-slate-700">הסבירו בזהירות מה אפשר להסיק</span>
+                                <div class="flex items-center gap-1" id="likert-stars-q5">
+                                    <!-- Dynamic Stars -->
+                                </div>
+                            </div>
+
+                            <!-- Question 6 -->
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-700">ההצגה הייתה מסודרת וברורה</span>
+                                <div class="flex items-center gap-1" id="likert-stars-q6">
+                                    <!-- Dynamic Stars -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mandatory Short Written Feedback -->
+                    <div class="space-y-4 pt-2">
+                        <h4 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                            <span>משוב מדעי פתוח (חובה)</span>
+                            <span class="text-rose-500 font-bold">*</span>
+                        </h4>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">1. נקודת חוזק אחת בהצגה:</label>
+                                <textarea id="peer-strength" rows="2" placeholder="לדוגמה: ההסבר שלכם על השערת המחקר היה מנומק היטב ביולוגית ולא נוסח כניחוש." class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">2. שאלה מדעית אחת שהיית שואל את הקבוצה:</label>
+                                <textarea id="peer-question" rows="2" placeholder="לדוגמה: כיצד שמרתם על טמפרטורה קבועה בכל הטיפולים השונים?" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">3. הצעה אחת לשיפור המחקר או ההצגה:</label>
+                                <textarea id="peer-improvement" rows="2" placeholder="לדוגמה: מומלץ להימנע מהמילה 'הוכחנו' שכן נתוני ה-RNA עדיין לא נמדדו בניסוי." class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-2">
+                        <button onclick="submitPeerReview()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2">
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                            שמור והגש משוב עמיתים
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- EDIT PEER REVIEW MODAL (TEACHER CONTROL) -->
+    <div id="modal-edit-review" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden no-print">
+        <div class="bg-white rounded-2xl max-w-lg w-full mx-4 p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                    <i data-lucide="edit" class="text-emerald-600"></i>
+                    עריכת משוב עמיתים ע"י מורה
+                </h3>
+                <button onclick="closeEditReviewModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <input type="hidden" id="edit-review-id">
+            
+            <div class="space-y-3 max-h-[400px] overflow-y-auto px-1">
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-0.5">קריטריון 1 (שאלת מחקר):</label>
+                        <select id="edit-review-q1" class="w-full border rounded p-1">
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-0.5">קריטריון 2 (רקע מדעי):</label>
+                        <select id="edit-review-q2" class="w-full border rounded p-1">
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-0.5">קריטריון 3 (מהלך הניסוי):</label>
+                        <select id="edit-review-q3" class="w-full border rounded p-1">
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-0.5">קריטריון 4 (תוצאות):</label>
+                        <select id="edit-review-q4" class="w-full border rounded p-1">
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-0.5">קריטריון 5 (זהירות מדעית):</label>
+                        <select id="edit-review-q5" class="w-full border rounded p-1">
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-0.5">קריטריון 6 (סדר ובהירות):</label>
+                        <select id="edit-review-q6" class="w-full border rounded p-1">
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="space-y-2 pt-2">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700">חוזקה:</label>
+                        <textarea id="edit-review-strength" rows="2" class="w-full border rounded p-1.5 text-xs"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700">שאלה מדעית:</label>
+                        <textarea id="edit-review-question" rows="2" class="w-full border rounded p-1.5 text-xs"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700">שיפור:</label>
+                        <textarea id="edit-review-improvement" rows="2" class="w-full border rounded p-1.5 text-xs"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="saveEditedReview()" class="flex-grow py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition text-sm">
+                    שמור שינויים במשוב
+                </button>
+                <button onclick="closeEditReviewModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl transition text-sm">
+                    ביטול
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal (To avoid native browser alerts) -->
+    <div id="modal-alert" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden no-print">
+        <div class="bg-white rounded-2xl max-w-sm w-full mx-4 p-6 shadow-2xl border border-slate-100 text-center space-y-4">
+            <div id="modal-icon-container" class="mx-auto w-12 h-12 rounded-full flex items-center justify-center bg-emerald-100 text-emerald-800">
+                <!-- Loaded dynamically -->
+            </div>
+            <div>
+                <h3 id="modal-title" class="font-bold text-slate-900 text-lg">כותרת הודעה</h3>
+                <p id="modal-body" class="text-sm text-slate-500 mt-1">תוכן הודעה פנימי.</p>
+            </div>
+            <button onclick="closeModal()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition text-sm">
+                הבנתי, תודה
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 text-center text-xs mt-12 no-print">
+        <p>© 2026 מערכת הערכת מחקר ביולוגי קבוצתי - הנדסה ביוטכנולוגית.</p>
+        <p class="mt-1 text-slate-500">עוצב ופותח בהתאם למסמך "משימת הצגת מחקר_2.docx"</p>
+    </footer>
+
+    <!-- Firebase SDK Imports & Custom Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by system
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'biotech-evaluation-2026';
+        const rawConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+        
+        let db = null;
+        let auth = null;
+        let activeUser = null;
+        let firebaseInitialized = false;
+
+        async function initFirebase() {
+            if (!rawConfig) {
+                console.warn("No Firebase configuration received. Falling back to local state.");
+                document.getElementById("firebase-state-txt").innerText = "מצב אופליין (מקומי) - נתונים יישמרו בדפדפן";
+                return;
+            }
+
+            try {
+                const firebaseConfig = JSON.parse(rawConfig);
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Authentication prior to database queries as per Rule 3
+                const customToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                if (customToken) {
+                    const userCredential = await signInWithCustomToken(auth, customToken);
+                    activeUser = userCredential.user;
+                } else {
+                    const userCredential = await signInAnonymously(auth);
+                    activeUser = userCredential.user;
+                }
+
+                if (activeUser) {
+                    firebaseInitialized = true;
+                    document.getElementById("firebase-state-txt").innerText = "מחובר ומסונכרן לענן - מזהה: " + activeUser.uid;
+                    setupRealtimeListeners();
+                }
+            } catch (err) {
+                console.error("Firebase Initialization Error:", err);
+                document.getElementById("firebase-state-txt").innerText = "שגיאת חיבור לענן - שומר מקומית";
+            }
+        }
+
+        function setupRealtimeListeners() {
+            if (!firebaseInitialized) return;
+
+            // Strict collection paths for public data as per Rule 1
+            const groupsCol = collection(db, 'artifacts', appId, 'public', 'data', 'groups');
+            const reviewsCol = collection(db, 'artifacts', appId, 'public', 'data', 'reviews');
+
+            // Listening to Groups
+            onSnapshot(groupsCol, (snapshot) => {
+                const loadedGroups = [];
+                snapshot.forEach(doc => {
+                    loadedGroups.push({ id: doc.id, ...doc.data() });
+                });
+                window.groups = loadedGroups;
+                window.rebuildGroupDropdowns();
+                window.rebuildStudentReviewDropdown();
+                window.renderClassTable();
+                window.renderIndividualGradingList();
+                
+                if (window.activeGroupId && loadedGroups.find(g => g.id === window.activeGroupId)) {
+                    window.changeActiveGroup(window.activeGroupId, false);
+                } else if (loadedGroups.length > 0) {
+                    window.changeActiveGroup(loadedGroups[0].id, false);
+                } else {
+                    window.resetScoresInputs();
+                }
+            }, (error) => {
+                console.error("Error reading groups from cloud:", error);
+            });
+
+            // Listening to Peer Reviews
+            onSnapshot(reviewsCol, (snapshot) => {
+                const loadedReviews = [];
+                snapshot.forEach(doc => {
+                    loadedReviews.push({ id: doc.id, ...doc.data() });
+                });
+                window.reviews = loadedReviews;
+                window.calculateWeightedScores();
+                window.renderActiveGroupPeerReviews();
+                window.renderClassTable();
+                window.updateStudentProgressWidget();
+            }, (error) => {
+                console.error("Error reading reviews from cloud:", error);
+            });
+        }
+
+        // Register functions globally for window access
+        window.firebaseInitialized = () => firebaseInitialized;
+        
+        window.saveGroupToCloud = async (group) => {
+            if (!firebaseInitialized) return;
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'groups', group.id);
+            await setDoc(docRef, group);
+        };
+        
+        window.saveReviewToCloud = async (review) => {
+            if (!firebaseInitialized) return;
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'reviews', review.id);
+            await setDoc(docRef, review);
+        };
+        
+        window.deleteReviewFromCloud = async (reviewId) => {
+            if (!firebaseInitialized) return;
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'reviews', reviewId);
+            await deleteDoc(docRef);
+        };
+        
+        window.clearCloudDatabase = async () => {
+            if (!firebaseInitialized) return;
+            const groupsCol = collection(db, 'artifacts', appId, 'public', 'data', 'groups');
+            const reviewsCol = collection(db, 'artifacts', appId, 'public', 'data', 'reviews');
+
+            const gSnap = await getDocs(groupsCol);
+            gSnap.forEach(async d => {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', d.id));
+            });
+
+            const rSnap = await getDocs(reviewsCol);
+            rSnap.forEach(async d => {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'reviews', d.id));
+            });
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initFirebase();
+        });
+    </script>
+
+    <script>
+        // Start completely clean of any mock/demo data as requested
+        let groups = [];
+        let reviews = [];
+        let activeGroupId = "";
+        
+        // local list builder for student names
+        let tempStudentsList = [];
+
+        // Active student submission values
+        let currentStudentScores = {
+            q1: 5, q2: 5, q3: 5, q4: 5, q5: 5, q6: 5
+        };
+
+        window.onload = function() {
+            // Check localStorage fallback if offline
+            if (!window.firebaseInitialized || !window.firebaseInitialized()) {
+                if (localStorage.getItem("biotech_groups_v3")) {
+                    groups = JSON.parse(localStorage.getItem("biotech_groups_v3"));
+                }
+                if (localStorage.getItem("biotech_reviews_v3")) {
+                    reviews = JSON.parse(localStorage.getItem("biotech_reviews_v3"));
+                }
+            }
+
+            // Bind UI Icons
+            lucide.createIcons();
+            
+            // Render Dynamic UI components
+            rebuildGroupDropdowns();
+            rebuildStudentReviewDropdown();
+            renderClassTable();
+            renderLikertStars();
+            updateStudentProgressWidget();
+
+            if (groups.length > 0) {
+                changeActiveGroup(groups[0].id);
+            } else {
+                resetScoresInputs();
+            }
+        };
+
+        function saveLocalState() {
+            if (!window.firebaseInitialized || !window.firebaseInitialized()) {
+                localStorage.setItem("biotech_groups_v3", JSON.stringify(groups));
+                localStorage.setItem("biotech_reviews_v3", JSON.stringify(reviews));
+            }
+        }
+
+        function resetScoresInputs() {
+            document.getElementById("eval-group-title").innerText = "אין קבוצות במערכת";
+            document.getElementById("c-bg").value = 0;
+            document.getElementById("c-hypothesis").value = 0;
+            document.getElementById("c-methods").value = 0;
+            document.getElementById("c-results").value = 0;
+            document.getElementById("c-caution").value = 0;
+            document.getElementById("c-presentation").value = 0;
+            document.getElementById("c-qna").value = 0;
+            
+            document.getElementById("teacher-total-badge").innerText = "0/100";
+            document.getElementById("peer-avg-stars").innerText = "0.0";
+            document.getElementById("peer-count").innerText = "0";
+            document.getElementById("peer-reviews-list").innerHTML = `
+                <div class="text-center py-6 bg-white border border-dashed border-slate-200 rounded-xl">
+                    <p class="text-xs font-bold text-slate-400">אנא הוסף קבוצה על מנת להתחיל</p>
+                </div>
+            `;
+            document.getElementById("individual-students-list-container").innerHTML = `
+                <div class="text-center py-4 text-slate-400 text-xs italic">אנא הוסף קבוצה על מנת להתחיל</div>
+            `;
+        }
+
+        async function clearAllData() {
+            if (confirm("האם אתה בטוח שברצונך למחוק לצמיתות את כל הקבוצות והמשובים? פעולה זו תאפס את הכל.")) {
+                groups = [];
+                reviews = [];
+                saveLocalState();
+                
+                if (window.firebaseInitialized && window.firebaseInitialized()) {
+                    await window.clearCloudDatabase();
+                }
+
+                rebuildGroupDropdowns();
+                rebuildStudentReviewDropdown();
+                resetScoresInputs();
+                renderClassTable();
+                updateStudentProgressWidget();
+                showModal("המערכת אופסה", "כל הקבוצות וטפסי הערכת עמיתים אופסו ונמחקו לחלוטין.", "trash-2", "bg-rose-100 text-rose-800");
+            }
+        }
+
+        function switchView(viewName) {
+            const btnTeacher = document.getElementById("tab-teacher");
+            const btnStudent = document.getElementById("tab-student");
+            const divTeacher = document.getElementById("view-teacher");
+            const divStudent = document.getElementById("view-student");
+
+            if (viewName === 'teacher') {
+                divTeacher.classList.remove('hidden');
+                divStudent.classList.add('hidden');
+                btnTeacher.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-emerald-500 text-white shadow";
+                btnStudent.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 text-emerald-300 hover:text-white";
+                renderClassTable();
+                if (activeGroupId) {
+                    changeActiveGroup(activeGroupId, false);
+                }
+            } else {
+                divTeacher.classList.add('hidden');
+                divStudent.classList.remove('hidden');
+                btnStudent.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-emerald-500 text-white shadow";
+                btnTeacher.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 text-emerald-300 hover:text-white";
+                rebuildStudentReviewDropdown();
+                updateStudentProgressWidget();
+            }
+        }
+
+        function toggleGuidelines() {
+            const panel = document.getElementById("guidelines-panel");
+            const btnText = document.getElementById("btn-guidelines-text");
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                btnText.innerText = "הסתר מבנה מצגת ודגשים";
+            } else {
+                panel.classList.add('hidden');
+                btnText.innerText = "הצג מבנה מצגת (10 שקופיות) ודגשים";
+            }
+        }
+
+        /* Group Builder Student List logic */
+        function addStudentToBuilderList() {
+            const input = document.getElementById("student-name-input");
+            const name = input.value.trim();
+            if (!name) return;
+            
+            // Add to temp array
+            tempStudentsList.push({
+                id: "student-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
+                name: name,
+                feedbackQuality: 100, // default evaluation
+                adjustment: 0 // default teacher offset
+            });
+            input.value = "";
+            renderBuilderChips();
+        }
+
+        function removeStudentFromBuilderList(id) {
+            tempStudentsList = tempStudentsList.filter(s => s.id !== id);
+            renderBuilderChips();
+        }
+
+        function renderBuilderChips() {
+            const container = document.getElementById("builder-students-chips");
+            container.innerHTML = "";
+            if (tempStudentsList.length === 0) {
+                container.innerHTML = `<span class="text-[10px] text-slate-400 italic">טרם נוספו תלמידים</span>`;
+                return;
+            }
+            tempStudentsList.forEach(s => {
+                const chip = document.createElement("span");
+                chip.className = "bg-emerald-100 text-emerald-800 text-xs font-semibold px-2 py-1 rounded-lg flex items-center gap-1";
+                chip.innerHTML = `
+                    <span>${s.name}</span>
+                    <button type="button" onclick="removeStudentFromBuilderList('${s.id}')" class="text-emerald-600 hover:text-emerald-900 font-bold">×</button>
+                `;
+                container.appendChild(chip);
+            });
+        }
+
+        // Dropdown Builders
+        function rebuildGroupDropdowns() {
+            const select = document.getElementById("active-group-select");
+            select.innerHTML = "";
+            
+            if (groups.length === 0) {
+                const opt = document.createElement("option");
+                opt.text = "-- אין קבוצות רשומות --";
+                select.appendChild(opt);
+                return;
+            }
+
+            groups.forEach(g => {
+                const opt = document.createElement("option");
+                opt.value = g.id;
+                opt.text = g.name;
+                if (g.id === activeGroupId) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function rebuildStudentReviewDropdown() {
+            const myGroupSelect = document.getElementById("student-my-group");
+            const targetGroupSelect = document.getElementById("review-target-group");
+            
+            // 1. Populate "My Group" dropdown
+            const currentMyGroupVal = myGroupSelect.value;
+            myGroupSelect.innerHTML = `<option value="">-- בחר את הקבוצה שלך --</option>`;
+            groups.forEach(g => {
+                const opt = document.createElement("option");
+                opt.value = g.id;
+                opt.text = g.name;
+                if (g.id === currentMyGroupVal) opt.selected = true;
+                myGroupSelect.appendChild(opt);
+            });
+
+            // 2. Populate target group selection, excluding "My Group"
+            const selectedMyGroupId = myGroupSelect.value;
+            targetGroupSelect.innerHTML = "";
+
+            const availableTargets = groups.filter(g => g.id !== selectedMyGroupId);
+
+            if (availableTargets.length === 0) {
+                const opt = document.createElement("option");
+                opt.text = "-- אין קבוצות זמינות להערכה --";
+                targetGroupSelect.appendChild(opt);
+            } else {
+                availableTargets.forEach(g => {
+                    const opt = document.createElement("option");
+                    opt.value = g.id;
+                    opt.text = g.name;
+                    targetGroupSelect.appendChild(opt);
+                });
+            }
+
+            // Populate My Name selector based on selected Group
+            rebuildMyNameDropdown();
+        }
+
+        function rebuildMyNameDropdown() {
+            const myGroupSelect = document.getElementById("student-my-group");
+            const myNameSelect = document.getElementById("student-my-name-select");
+            const selectedMyGroupId = myGroupSelect.value;
+
+            myNameSelect.innerHTML = "";
+
+            if (!selectedMyGroupId) {
+                myNameSelect.innerHTML = `<option value="">-- בחר תחילה קבוצה --</option>`;
+                return;
+            }
+
+            const g = groups.find(group => group.id === selectedMyGroupId);
+            if (!g || !g.students || g.students.length === 0) {
+                myNameSelect.innerHTML = `<option value="">-- אין תלמידים רשומים בקבוצה זו --</option>`;
+                return;
+            }
+
+            myNameSelect.innerHTML = `<option value="">-- בחר את שמך --</option>`;
+            g.students.forEach(s => {
+                const opt = document.createElement("option");
+                opt.value = s.id;
+                opt.text = s.name;
+                myNameSelect.appendChild(opt);
+            });
+        }
+
+        function handleMyGroupChange() {
+            rebuildStudentReviewDropdown();
+            updateStudentProgressWidget();
+        }
+
+        async function createNewGroup() {
+            const name = document.getElementById("new-group-name").value.trim();
+            const topic = document.getElementById("new-group-topic").value.trim();
+
+            if (!name) {
+                showModal("שגיאה ברישום", "אנא הזן שם קבוצה תקני לפני הוספה.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+
+            if (tempStudentsList.length === 0) {
+                showModal("אין תלמידים בקבוצה", "אנא הוסף לפחות תלמיד אחד לקבוצה על מנת להקים אותה.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+
+            const id = "group-" + Date.now();
+            const newG = {
+                id: id,
+                name: name,
+                topic: topic || "מחקרי קסניה ביולוגיים",
+                students: [...tempStudentsList], // copy the individual student objects
+                teacherScores: { bg: 0, hypothesis: 0, methods: 0, results: 0, caution: 0, presentation: 0, qna: 0 }
+            };
+
+            groups.push(newG);
+            saveLocalState();
+            
+            if (window.firebaseInitialized && window.firebaseInitialized()) {
+                await window.saveGroupToCloud(newG);
+            }
+
+            // Clear build list
+            tempStudentsList = [];
+            renderBuilderChips();
+
+            rebuildGroupDropdowns();
+            changeActiveGroup(id);
+            renderClassTable();
+
+            // Clear inputs
+            document.getElementById("new-group-name").value = "";
+            document.getElementById("new-group-topic").value = "";
+
+            showModal("הקבוצה נוספה בהצלחה!", `קבוצה בשם "${name}" עם ${newG.students.length} תלמידים הוגדרה במערכת.`, "check-circle", "bg-emerald-100 text-emerald-800");
+        }
+
+        function changeActiveGroup(groupId, updateFields = true) {
+            if (!groupId || groups.length === 0) return;
+            activeGroupId = groupId;
+            const g = groups.find(group => group.id === groupId);
+            if (!g) return;
+
+            document.getElementById("eval-group-title").innerText = g.name;
+            
+            if (updateFields) {
+                // Set form inputs
+                document.getElementById("c-bg").value = g.teacherScores.bg || 0;
+                document.getElementById("c-hypothesis").value = g.teacherScores.hypothesis || 0;
+                document.getElementById("c-methods").value = g.teacherScores.methods || 0;
+                document.getElementById("c-results").value = g.teacherScores.results || 0;
+                document.getElementById("c-caution").value = g.teacherScores.caution || 0;
+                document.getElementById("c-presentation").value = g.teacherScores.presentation || 0;
+                document.getElementById("c-qna").value = g.teacherScores.qna || 0;
+            }
+
+            updateTeacherScore();
+            renderActiveGroupPeerReviews();
+            renderIndividualGradingList();
+        }
+
+        function updateTeacherScore() {
+            const bg = parseInt(document.getElementById("c-bg").value) || 0;
+            const hyp = parseInt(document.getElementById("c-hypothesis").value) || 0;
+            const meth = parseInt(document.getElementById("c-methods").value) || 0;
+            const res = parseInt(document.getElementById("c-results").value) || 0;
+            const caut = parseInt(document.getElementById("c-caution").value) || 0;
+            const pres = parseInt(document.getElementById("c-presentation").value) || 0;
+            const qna = parseInt(document.getElementById("c-qna").value) || 0;
+
+            const sum = bg + hyp + meth + res + caut + pres + qna;
+            document.getElementById("teacher-total-badge").innerText = `${sum}/100`;
+
+            calculateWeightedScores();
+        }
+
+        async function saveActiveGroupTeacherScores() {
+            const g = groups.find(group => group.id === activeGroupId);
+            if (!g) return;
+
+            g.teacherScores = {
+                bg: Math.min(15, Math.max(0, parseInt(document.getElementById("c-bg").value) || 0)),
+                hypothesis: Math.min(15, Math.max(0, parseInt(document.getElementById("c-hypothesis").value) || 0)),
+                methods: Math.min(20, Math.max(0, parseInt(document.getElementById("c-methods").value) || 0)),
+                results: Math.min(20, Math.max(0, parseInt(document.getElementById("c-results").value) || 0)),
+                caution: Math.min(15, Math.max(0, parseInt(document.getElementById("c-caution").value) || 0)),
+                presentation: Math.min(10, Math.max(0, parseInt(document.getElementById("c-presentation").value) || 0)),
+                qna: Math.min(5, Math.max(0, parseInt(document.getElementById("c-qna").value) || 0))
+            };
+
+            saveLocalState();
+            
+            if (window.firebaseInitialized && window.firebaseInitialized()) {
+                await window.saveGroupToCloud(g);
+            }
+
+            renderClassTable();
+            renderIndividualGradingList();
+            showModal("ציוני מחוון נשמרו", `ציוני המצגת הקבוצתיים עבור "${g.name}" נשמרו בהצלחה ועודכנו בענן.`, "check", "bg-emerald-100 text-emerald-800");
+        }
+
+        // Calculate the weights based on 80-10-10
+        function calculateWeightedScores() {
+            const g = groups.find(group => group.id === activeGroupId);
+            if (!g) return;
+
+            // 1. Teacher Presentation Score (80%)
+            const tScore = (g.teacherScores.bg || 0) + (g.teacherScores.hypothesis || 0) + (g.teacherScores.methods || 0) + 
+                           (g.teacherScores.results || 0) + (g.teacherScores.caution || 0) + (g.teacherScores.presentation || 0) + 
+                           (g.teacherScores.qna || 0);
+
+            // 2. Peer Score average (10%)
+            const groupReviews = reviews.filter(r => r.targetGroupId === activeGroupId);
+            let avgStars = 0;
+            let peerAvgPct = 0;
+
+            if (groupReviews.length > 0) {
+                let totalLikertScore = 0;
+                groupReviews.forEach(r => {
+                    totalLikertScore += (r.scores.q1 + r.scores.q2 + r.scores.q3 + r.scores.q4 + r.scores.q5 + r.scores.q6);
+                });
+                peerAvgPct = (totalLikertScore / (groupReviews.length * 30)) * 100;
+                avgStars = (totalLikertScore / (groupReviews.length * 6));
+            }
+
+            document.getElementById("peer-avg-stars").innerText = avgStars.toFixed(1);
+            document.getElementById("peer-count").innerText = groupReviews.length;
+        }
+
+        // Generate the Individual Student controls in the Teacher Panel
+        function renderIndividualGradingList() {
+            const container = document.getElementById("individual-students-list-container");
+            container.innerHTML = "";
+
+            const g = groups.find(group => group.id === activeGroupId);
+            if (!g) {
+                container.innerHTML = `<div class="text-center py-4 text-slate-400 text-xs italic">בחר קבוצה להצגת רשימת תלמידים</div>`;
+                return;
+            }
+
+            if (!g.students || g.students.length === 0) {
+                container.innerHTML = `<div class="text-center py-4 text-slate-400 text-xs italic">אין תלמידים רשומים בקבוצה זו.</div>`;
+                return;
+            }
+
+            // Calculations
+            const tPresentationScore = (g.teacherScores.bg || 0) + (g.teacherScores.hypothesis || 0) + (g.teacherScores.methods || 0) + 
+                                       (g.teacherScores.results || 0) + (g.teacherScores.caution || 0) + (g.teacherScores.presentation || 0) + 
+                                       (g.teacherScores.qna || 0);
+
+            const groupReviews = reviews.filter(r => r.targetGroupId === g.id);
+            let peerAvgPct = 0;
+            if (groupReviews.length > 0) {
+                let sum = 0;
+                groupReviews.forEach(r => {
+                    sum += (r.scores.q1 + r.scores.q2 + r.scores.q3 + r.scores.q4 + r.scores.q5 + r.scores.q6);
+                });
+                peerAvgPct = (sum / (groupReviews.length * 30)) * 100;
+            }
+
+            // Combined Presentation Component (90% of final score if calculated relative to 90 points)
+            // presentation group component = 80% teacher + 10% peer = 90 points max
+            const groupPresentationComponent = ((tPresentationScore / 100) * 80) + ((peerAvgPct / 100) * 10);
+
+            g.students.forEach(s => {
+                const writtenReviews = reviews.filter(r => r.reviewerStudentId === s.id);
+                const submissionCount = writtenReviews.length;
+
+                // Student final score
+                const feedbackComponent = ((s.feedbackQuality || 0) / 100) * 10; // max 10 points
+                let finalScore = groupPresentationComponent + feedbackComponent + (s.adjustment || 0);
+                finalScore = Math.max(0, Math.min(100, finalScore)); // clamp between 0 and 100
+
+                const card = document.createElement("div");
+                card.className = "bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-3";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                        <span class="font-extrabold text-slate-800 text-sm flex items-center gap-1">
+                            <i data-lucide="user" class="w-4 h-4 text-emerald-600"></i>
+                            ${s.name}
+                        </span>
+                        <div class="text-left">
+                            <span class="text-[9px] text-slate-400 block uppercase">ציון סופי מחושב</span>
+                            <span class="text-base font-black text-emerald-700 mono-font">${finalScore.toFixed(1)} / 100</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-500 font-semibold block">קבוצת פראזנטציה (90%):</span>
+                            <span class="font-bold text-slate-700">${groupPresentationComponent.toFixed(1)} / 90</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-500 font-semibold block">הגשות עמיתים שביצע:</span>
+                            <span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${submissionCount >= 2 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                ${submissionCount}/2 קבוצות
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Individual Feedback Quality Grade -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-[11px] font-bold text-slate-700">
+                            <span>ציון איכות משוב (10%):</span>
+                            <span class="text-purple-700"><span id="ind-fq-val-${s.id}">${s.feedbackQuality || 100}</span>%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="${s.feedbackQuality || 100}" 
+                            oninput="document.getElementById('ind-fq-val-${s.id}').innerText = this.value; updateIndividualFeedbackScore('${s.id}', this.value)" 
+                            class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                    </div>
+
+                    <!-- Adjustment Teacher Offset -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-[11px] font-bold text-slate-700">
+                            <span>התאמת ציון מורה אישית (Adjustment Offset):</span>
+                            <span class="${(s.adjustment || 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}">
+                                ${(s.adjustment || 0) >= 0 ? '+' : ''}${s.adjustment || 0} נק'
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="range" min="-15" max="15" value="${s.adjustment || 0}" 
+                                oninput="updateIndividualAdjustment('${s.id}', this.value)" 
+                                class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        async function updateIndividualFeedbackScore(studentId, value) {
+            const g = groups.find(group => group.id === activeGroupId);
+            if (!g) return;
+            const student = g.students.find(s => s.id === studentId);
+            if (student) {
+                student.feedbackQuality = parseInt(value);
+                saveLocalState();
+                if (window.firebaseInitialized && window.firebaseInitialized()) {
+                    await window.saveGroupToCloud(g);
+                }
+                renderClassTable();
+                // We update calculations without redrawing the active list immediately to avoid interrupting slider drag
+                calculateAndDebounceIndividualListScores();
+            }
+        }
+
+        async function updateIndividualAdjustment(studentId, value) {
+            const g = groups.find(group => group.id === activeGroupId);
+            if (!g) return;
+            const student = g.students.find(s => s.id === studentId);
+            if (student) {
+                student.adjustment = parseInt(value);
+                saveLocalState();
+                if (window.firebaseInitialized && window.firebaseInitialized()) {
+                    await window.saveGroupToCloud(g);
+                }
+                renderClassTable();
+                calculateAndDebounceIndividualListScores();
+            }
+        }
+
+        let debounceTimeout = null;
+        function calculateAndDebounceIndividualListScores() {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+                renderIndividualGradingList();
+            }, 1000); // redraw list 1s after last adjust
+        }
+
+        function calcStudentRowScore(groupObj, studentObj) {
+            const tScore = (groupObj.teacherScores.bg || 0) + (groupObj.teacherScores.hypothesis || 0) + (groupObj.teacherScores.methods || 0) + 
+                           (groupObj.teacherScores.results || 0) + (groupObj.teacherScores.caution || 0) + (groupObj.teacherScores.presentation || 0) + 
+                           (groupObj.teacherScores.qna || 0);
+            
+            const groupReviews = reviews.filter(r => r.targetGroupId === groupObj.id);
+            let peerAvgPct = 0;
+            if (groupReviews.length > 0) {
+                let totalLikertScore = 0;
+                groupReviews.forEach(r => {
+                    totalLikertScore += (r.scores.q1 + r.scores.q2 + r.scores.q3 + r.scores.q4 + r.scores.q5 + r.scores.q6);
+                });
+                peerAvgPct = (totalLikertScore / (groupReviews.length * 30)) * 100;
+            }
+
+            const presentationComponent = ((tScore / 100) * 80) + ((peerAvgPct / 100) * 10);
+            const feedbackComponent = ((studentObj.feedbackQuality || 100) / 100) * 10;
+            
+            const final = presentationComponent + feedbackComponent + (studentObj.adjustment || 0);
+            return Math.max(0, Math.min(100, final)).toFixed(1);
+        }
+
+        function renderActiveGroupPeerReviews() {
+            const listContainer = document.getElementById("peer-reviews-list");
+            listContainer.innerHTML = "";
+
+            const activeReviews = reviews.filter(r => r.targetGroupId === activeGroupId);
+
+            if (activeReviews.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-6 bg-white border border-dashed border-slate-200 rounded-xl">
+                        <i data-lucide="message-square" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+                        <p class="text-xs font-bold text-slate-500">טרם התקבל משוב עמיתים לקבוצה זו.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            activeReviews.forEach(r => {
+                const totalRating = ((r.scores.q1 + r.scores.q2 + r.scores.q3 + r.scores.q4 + r.scores.q5 + r.scores.q6) / 6).toFixed(1);
+                
+                const card = document.createElement("div");
+                card.className = "bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2 text-xs relative";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-100 font-bold">
+                        <div class="flex items-center gap-1.5 text-slate-800">
+                            <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-600"></i>
+                            מאת: ${r.reviewerName} (קבוצה: ${r.reviewerGroupName || 'לא ידוע'})
+                        </div>
+                        <div class="flex items-center gap-1 bg-amber-50 text-amber-800 px-2 py-0.5 rounded text-[10px]">
+                            ★ ${totalRating} / 5
+                        </div>
+                    </div>
+                    <div class="space-y-1.5 text-slate-600 leading-relaxed">
+                        <div><strong class="text-emerald-800">💪 חוזקה:</strong> ${r.strength}</div>
+                        <div><strong class="text-blue-800">🔬 שאלה מדעית:</strong> ${r.question}</div>
+                        <div><strong class="text-purple-800">🎯 שיפור:</strong> ${r.improvement}</div>
+                    </div>
+                    
+                    <!-- Teacher controls for reviews -->
+                    <div class="flex gap-2 justify-end pt-2 mt-1 border-t border-slate-100 no-print">
+                        <button onclick="openEditReviewModal('${r.id}')" class="text-emerald-600 hover:text-emerald-800 font-bold flex items-center gap-0.5 transition" title="ערוך משוב">
+                            <i data-lucide="edit" class="w-3 h-3"></i> ערוך
+                        </button>
+                        <button onclick="deleteReview('${r.id}')" class="text-slate-400 hover:text-rose-600 font-bold flex items-center gap-0.5 transition" title="מחק משוב">
+                            <i data-lucide="trash" class="w-3 h-3"></i> מחק
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // Teacher edits peer review
+        function openEditReviewModal(reviewId) {
+            const r = reviews.find(review => review.id === reviewId);
+            if (!r) return;
+
+            document.getElementById("edit-review-id").value = r.id;
+            document.getElementById("edit-review-q1").value = r.scores.q1;
+            document.getElementById("edit-review-q2").value = r.scores.q2;
+            document.getElementById("edit-review-q3").value = r.scores.q3;
+            document.getElementById("edit-review-q4").value = r.scores.q4;
+            document.getElementById("edit-review-q5").value = r.scores.q5;
+            document.getElementById("edit-review-q6").value = r.scores.q6;
+
+            document.getElementById("edit-review-strength").value = r.strength;
+            document.getElementById("edit-review-question").value = r.question;
+            document.getElementById("edit-review-improvement").value = r.improvement;
+
+            document.getElementById("modal-edit-review").classList.remove("hidden");
+            lucide.createIcons();
+        }
+
+        function closeEditReviewModal() {
+            document.getElementById("modal-edit-review").classList.add("hidden");
+        }
+
+        async function saveEditedReview() {
+            const id = document.getElementById("edit-review-id").value;
+            const r = reviews.find(review => review.id === id);
+            if (!r) return;
+
+            r.scores.q1 = parseInt(document.getElementById("edit-review-q1").value);
+            r.scores.q2 = parseInt(document.getElementById("edit-review-q2").value);
+            r.scores.q3 = parseInt(document.getElementById("edit-review-q3").value);
+            r.scores.q4 = parseInt(document.getElementById("edit-review-q4").value);
+            r.scores.q5 = parseInt(document.getElementById("edit-review-q5").value);
+            r.scores.q6 = parseInt(document.getElementById("edit-review-q6").value);
+
+            r.strength = document.getElementById("edit-review-strength").value.trim();
+            r.question = document.getElementById("edit-review-question").value.trim();
+            r.improvement = document.getElementById("edit-review-improvement").value.trim();
+
+            saveLocalState();
+            
+            if (window.firebaseInitialized && window.firebaseInitialized()) {
+                await window.saveReviewToCloud(r);
+            }
+
+            closeEditReviewModal();
+            changeActiveGroup(activeGroupId);
+            renderClassTable();
+            showModal("משוב עמיתים עודכן", "עדכנת בהצלחה את פרטי משוב העמיתים כמורה.", "check-circle", "bg-emerald-100 text-emerald-800");
+        }
+
+        async function deleteReview(reviewId) {
+            if (confirm("האם אתה בטוח שברצונך למחוק משוב זה?")) {
+                reviews = reviews.filter(r => r.id !== reviewId);
+                saveLocalState();
+                
+                if (window.firebaseInitialized && window.firebaseInitialized()) {
+                    await window.deleteReviewFromCloud(reviewId);
+                }
+
+                changeActiveGroup(activeGroupId);
+                renderClassTable();
+                updateStudentProgressWidget();
+            }
+        }
+
+        function renderClassTable() {
+            const tbody = document.getElementById("class-scores-table-body");
+            tbody.innerHTML = "";
+
+            if (groups.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-6 text-center text-slate-500 font-bold text-xs">
+                            אין קבוצות מוגדרות במערכת.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            groups.forEach(g => {
+                if (!g.students || g.students.length === 0) return;
+
+                const tPresentationScore = (g.teacherScores.bg || 0) + (g.teacherScores.hypothesis || 0) + (g.teacherScores.methods || 0) + 
+                                           (g.teacherScores.results || 0) + (g.teacherScores.caution || 0) + (g.teacherScores.presentation || 0) + 
+                                           (g.teacherScores.qna || 0);
+
+                const groupReviews = reviews.filter(r => r.targetGroupId === g.id);
+                let peerAvgPct = 0;
+                if (groupReviews.length > 0) {
+                    let sum = 0;
+                    groupReviews.forEach(r => {
+                        sum += (r.scores.q1 + r.scores.q2 + r.scores.q3 + r.scores.q4 + r.scores.q5 + r.scores.q6);
+                    });
+                    peerAvgPct = (sum / (groupReviews.length * 30)) * 100;
+                }
+
+                const groupPresentationComponent = ((tPresentationScore / 100) * 80) + ((peerAvgPct / 100) * 10);
+
+                g.students.forEach((s, idx) => {
+                    const writtenReviews = reviews.filter(r => r.reviewerStudentId === s.id);
+                    const submissionCount = writtenReviews.length;
+                    const finalWeighted = calcStudentRowScore(g, s);
+
+                    const tr = document.createElement("tr");
+                    tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                    
+                    tr.innerHTML = `
+                        <td class="p-3 font-bold text-emerald-900 ${idx === 0 ? 'bg-slate-50/20' : ''}">${idx === 0 ? g.name : '<span class="text-slate-300">"</span>'}</td>
+                        <td class="p-3 text-slate-800 font-semibold">${s.name}</td>
+                        <td class="p-3 text-slate-700 font-medium">${groupPresentationComponent.toFixed(1)} / 90</td>
+                        <td class="p-3 text-slate-700">${s.feedbackQuality || 100}%</td>
+                        <td class="p-3 font-bold ${s.adjustment >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${s.adjustment >= 0 ? '+' : ''}${s.adjustment || 0} נק'</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded-full text-xs font-bold ${submissionCount >= 2 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                ${submissionCount}/2
+                            </span>
+                        </td>
+                        <td class="p-3 text-left font-black text-emerald-800 text-base mono-font">${finalWeighted} / 100</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        // Render Student 5-star Likert elements
+        function renderLikertStars() {
+            const questions = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6'];
+            questions.forEach(q => {
+                const val = currentStudentScores[q];
+                const container = document.getElementById(`likert-stars-${q}`);
+                container.innerHTML = "";
+                for (let i = 1; i <= 5; i++) {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.onclick = () => setLikertStar(q, i);
+                    btn.className = "hover:scale-125 transition";
+                    
+                    const icon = document.createElement("i");
+                    icon.setAttribute("data-lucide", "star");
+                    icon.className = `w-4 h-4 ${i <= val ? 'text-amber-500 fill-amber-400' : 'text-slate-300'}`;
+                    btn.appendChild(icon);
+                    container.appendChild(btn);
+                }
+            });
+            lucide.createIcons();
+        }
+
+        function setLikertStar(question, rating) {
+            currentStudentScores[question] = rating;
+            renderLikertStars();
+        }
+
+        async function submitPeerReview() {
+            const myGroupId = document.getElementById("student-my-group").value;
+            const reviewerStudentId = document.getElementById("student-my-name-select").value;
+            const targetGroupId = document.getElementById("review-target-group").value;
+            const strength = document.getElementById("peer-strength").value.trim();
+            const question = document.getElementById("peer-question").value.trim();
+            const improvement = document.getElementById("peer-improvement").value.trim();
+
+            if (!myGroupId) {
+                showModal("שגיאה בהגשה", "אנא בחר את הקבוצה שבה אתה חבר.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+
+            if (!reviewerStudentId) {
+                showModal("שגיאה בהגשה", "אנא בחר את שמך המלא מרשימת התלמידים בקבוצה שלך.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+
+            if (!targetGroupId || targetGroupId.startsWith("--")) {
+                showModal("שגיאה בקבוצה", "אנא בחר קבוצה תקינה להערכה מתוך הרשימה.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+
+            if (myGroupId === targetGroupId) {
+                showModal("שגיאה בהערכה עצמית", "אינך יכול להעריך את קבוצת המחקר של עצמך. אנא בחר קבוצה אחרת.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+
+            // Scientific rigor evaluation verification
+            if (!strength || !question || !improvement) {
+                showModal("חסרים שדות משוב", "אנא מלא את כל שלושת שאלות המשוב המדעי הפתוח. הן חובה על מנת לתרגל חשיבה ביקורתית.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+
+            if (strength.length < 5 || question.length < 5 || improvement.length < 5) {
+                showModal("משוב קצר מדי", "אנא כתוב משוב מפורט מונחה-מדע של לפחות משפט אחד לכל קריטריון.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+
+            // Get selected student name object
+            const myGroupObj = groups.find(g => g.id === myGroupId);
+            const myStudentObj = myGroupObj.students.find(s => s.id === reviewerStudentId);
+            const reviewerName = myStudentObj ? myStudentObj.name : "סטודנט";
+
+            // Check duplicate reviews for same target group by same reviewer name
+            const existing = reviews.find(r => r.reviewerStudentId === reviewerStudentId && r.targetGroupId === targetGroupId);
+            if (existing) {
+                showModal("קבוצה זו כבר הוערכה", "כבר הגשת הערכה לקבוצה המציגה הזו.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+
+            const newRev = {
+                id: "rev-" + Date.now(),
+                reviewerStudentId: reviewerStudentId,
+                reviewerName: reviewerName,
+                reviewerGroupId: myGroupId,
+                reviewerGroupName: myGroupObj ? myGroupObj.name : "קבוצה פנימית",
+                targetGroupId: targetGroupId,
+                scores: { ...currentStudentScores },
+                strength: strength,
+                question: question,
+                improvement: improvement
+            };
+
+            reviews.push(newRev);
+            saveLocalState();
+
+            if (window.firebaseInitialized && window.firebaseInitialized()) {
+                await window.saveReviewToCloud(newRev);
+            }
+
+            // Clear inputs
+            document.getElementById("peer-strength").value = "";
+            document.getElementById("peer-question").value = "";
+            document.getElementById("peer-improvement").value = "";
+            
+            // Reset state
+            currentStudentScores = { q1: 5, q2: 5, q3: 5, q4: 5, q5: 5, q6: 5 };
+            renderLikertStars();
+            updateStudentProgressWidget();
+
+            const targetG = groups.find(g => g.id === targetGroupId);
+            showModal("המשוב הוגש בהצלחה!", `המשוב שלך עבור "${targetG ? targetG.name : 'הקבוצה'}" תועד במערכת ועודכן בזמן אמת.`, "check-circle", "bg-emerald-100 text-emerald-800");
+        }
+
+        function updateStudentProgressWidget() {
+            const reviewerStudentId = document.getElementById("student-my-name-select").value;
+            const widget = document.getElementById("student-progress-text");
+            const pdfBtn = document.getElementById("btn-download-pdf");
+            
+            if (!reviewerStudentId) {
+                widget.innerHTML = `<span class="text-slate-400 text-xs">בחר שם סטודנט למעקב הגשות...</span>`;
+                pdfBtn.classList.add("hidden");
+                return;
+            }
+
+            const studentReviews = reviews.filter(r => r.reviewerStudentId === reviewerStudentId);
+            const count = studentReviews.length;
+
+            if (count === 0) {
+                widget.innerHTML = `
+                    <div class="flex items-center justify-center gap-1.5 text-amber-700 text-xs font-bold">
+                        <i data-lucide="circle" class="w-4.5 h-4.5"></i>
+                        0/2 קבוצות הוערכו. נותרו עוד 2 הגשות.
+                    </div>
+                `;
+                pdfBtn.classList.add("hidden");
+            } else if (count === 1) {
+                widget.innerHTML = `
+                    <div class="flex items-center justify-center gap-1.5 text-blue-700 text-xs font-bold">
+                        <i data-lucide="pie-chart" class="w-4.5 h-4.5 animate-pulse"></i>
+                        1/2 קבוצות הוערכו. הגש עוד קבוצה אחת!
+                    </div>
+                `;
+                pdfBtn.classList.add("hidden");
+            } else {
+                widget.innerHTML = `
+                    <div class="flex items-center justify-center gap-1.5 text-emerald-800 text-xs font-bold">
+                        <i data-lucide="check-circle" class="w-4.5 h-4.5 text-emerald-600"></i>
+                        2/2 קבוצות הוערכו. עמדת במשימה!
+                    </div>
+                `;
+                // Show PDF download button when at least 2 submissions are completed
+                pdfBtn.classList.remove("hidden");
+            }
+            lucide.createIcons();
+        }
+
+        function exportStudentReviewPDF() {
+            const myGroupId = document.getElementById("student-my-group").value;
+            const reviewerStudentId = document.getElementById("student-my-name-select").value;
+
+            const myGroupObj = groups.find(g => g.id === myGroupId);
+            const myGroupName = myGroupObj ? myGroupObj.name : "קבוצה פנימית";
+            const myStudentObj = myGroupObj ? myGroupObj.students.find(s => s.id === reviewerStudentId) : null;
+            const reviewerName = myStudentObj ? myStudentObj.name : "סטודנט";
+
+            const studentReviews = reviews.filter(r => r.reviewerStudentId === reviewerStudentId);
+            
+            if (studentReviews.length === 0) {
+                showModal("אין הגשות לייצוא", "אנא הגש משובים לפני הניסיון לייצא דוח.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+
+            // Create window with print-optimized HTML layout
+            const printWindow = window.open('', '_blank');
+            
+            let reviewsHTML = '';
+            studentReviews.forEach((r, idx) => {
+                const targetG = groups.find(g => g.id === r.targetGroupId);
+                const targetName = targetG ? targetG.name : "קבוצה";
+                const avgRating = ((r.scores.q1 + r.scores.q2 + r.scores.q3 + r.scores.q4 + r.scores.q5 + r.scores.q6) / 6).toFixed(1);
+
+                reviewsHTML += `
+                    <div style="margin-bottom: 30px; border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; background-color: #fafbfd; page-break-inside: avoid;">
+                        <h3 style="color: #047857; margin-top: 0; border-bottom: 2px solid #059669; padding-bottom: 8px; font-size: 16px;">
+                            הערכה #${idx + 1}: עבור ${targetName}
+                        </h3>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 13px;">
+                            <tr style="background-color: #f1f5f9;">
+                                <th style="border: 1px solid #e2e8f0; padding: 6px; text-align: right; width: 75%;">קריטריון דירוג</th>
+                                <th style="border: 1px solid #e2e8f0; padding: 6px; text-align: center; width: 25%;">ציון (1-5)</th>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px;">הבנת שאלת המחקר</td>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px; text-align: center; font-weight: bold;">${r.scores.q1} / 5</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px;">בהירות הרקע המדעי</td>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px; text-align: center; font-weight: bold;">${r.scores.q2} / 5</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px;">הבנת מהלך הניסוי והשלבים</td>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px; text-align: center; font-weight: bold;">${r.scores.q3} / 5</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px;">בהירות הצגת התוצאות</td>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px; text-align: center; font-weight: bold;">${r.scores.q4} / 5</td>
+                            </tr>
+                            <tr style="background-color: #fef3c7;">
+                                <td style="border: 1px solid #e2e8f0; padding: 6px; font-weight: bold;">הסבר בזהירות מה ניתן להסיק (זהירות מדעית)</td>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px; text-align: center; font-weight: bold; color: #b45309;">${r.scores.q5} / 5</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px;">סדר ובהירות ההצגה הכללית</td>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px; text-align: center; font-weight: bold;">${r.scores.q6} / 5</td>
+                            </tr>
+                            <tr style="background-color: #e2e8f0; font-weight: bold;">
+                                <td style="border: 1px solid #e2e8f0; padding: 6px;">ממוצע דירוג כולל</td>
+                                <td style="border: 1px solid #e2e8f0; padding: 6px; text-align: center;">${avgRating} / 5</td>
+                            </tr>
+                        </table>
+                        <div style="font-size: 13px; line-height: 1.6; color: #334155;">
+                            <p style="margin: 4px 0;"><strong>💪 נקודת חוזק אחת בהצגה:</strong></p>
+                            <div style="background-color: #f8fafc; padding: 8px; border-right: 4px solid #10b981; margin-bottom: 10px;">${r.strength}</div>
+                            
+                            <p style="margin: 4px 0;"><strong>🔬 שאלה מדעית אחת שהייתי שואל את הקבוצה:</strong></p>
+                            <div style="background-color: #f8fafc; padding: 8px; border-right: 4px solid #3b82f6; margin-bottom: 10px;">${r.question}</div>
+                            
+                            <p style="margin: 4px 0;"><strong>🎯 הצעה אחת לשיפור המחקר או ההצגה:</strong></p>
+                            <div style="background-color: #f8fafc; padding: 8px; border-right: 4px solid #8b5cf6;">${r.improvement}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="he" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>דו"ח הגשת משוב עמיתים - ${reviewerName}</title>
+                    <style>
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            margin: 40px;
+                            color: #1e293b;
+                            line-height: 1.5;
+                        }
+                        .header {
+                            text-align: center;
+                            border-bottom: 3px double #047857;
+                            padding-bottom: 15px;
+                            margin-bottom: 25px;
+                        }
+                        .meta-box {
+                            background-color: #f8fafc;
+                            border: 1px solid #e2e8f0;
+                            border-radius: 8px;
+                            padding: 15px;
+                            margin-bottom: 25px;
+                            font-size: 14px;
+                        }
+                        .footer {
+                            text-align: center;
+                            margin-top: 50px;
+                            font-size: 11px;
+                            color: #64748b;
+                            border-top: 1px solid #e2e8f0;
+                            padding-top: 10px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1 style="color: #065f46; margin: 0; font-size: 24px;">טופס הגשת משוב עמיתים - ביוטכנולוגיה</h1>
+                        <p style="margin: 5px 0 0 0; font-size: 14px; color: #047857;">משימת הצגת מחקר - על פי הנחיות "משימת הצגת מחקר_2.docx"</p>
+                    </div>
+                    
+                    <div class="meta-box">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="width: 50%; padding: 4px 0;"><strong>שם הסטודנט המעריך:</strong> ${reviewerName}</td>
+                                <td style="width: 50%; padding: 4px 0;"><strong>הקבוצה שלי:</strong> ${myGroupName}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 50%; padding: 4px 0;"><strong>תאריך הפקת דוח:</strong> ${new Date().toLocaleDateString('he-IL')}</td>
+                                <td style="width: 50%; padding: 4px 0;"><strong>מצב משימה:</strong> ✅ הושלמו 2 הגשות כנדרש</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    ${reviewsHTML}
+
+                    <div class="footer">
+                        <p>הופק אוטומטית באמצעות מערכת הערכת פרזנטציות - ביוטכנולוגיה. יש להגיש למורה בהתאם להנחיות.</p>
+                    </div>
+
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        function showModal(title, text, iconName = 'info', colorClass = 'bg-emerald-100 text-emerald-800') {
+            const modal = document.getElementById("modal-alert");
+            document.getElementById("modal-title").innerText = title;
+            document.getElementById("modal-body").innerText = text;
+            
+            const iconContainer = document.getElementById("modal-icon-container");
+            iconContainer.className = `mx-auto w-12 h-12 rounded-full flex items-center justify-center ${colorClass}`;
+            iconContainer.innerHTML = `<i data-lucide="${iconName}" class="w-6 h-6"></i>`;
+            
+            modal.classList.remove("hidden");
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById("modal-alert").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>
+```
+eof

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מעבדת חקירה בסטטיסטיקה - תכנית אלפא</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .toggle-checkbox:checked { right: 0; border-color: #68D391; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #68D391; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 font-sans">
+
+    <!-- Header -->
+    <header class="bg-indigo-900 text-white p-6 shadow-md">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold mb-1">מעבדת חקירה בסטטיסטיקה 🔬</h1>
+                <p class="text-indigo-200">תכנית אלפא - מתיאוריה לניתוח ביקורתי</p>
+            </div>
+            <div class="text-sm bg-indigo-800 px-4 py-2 rounded-lg border border-indigo-700">
+                גרסת תלמידים
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <div class="max-w-6xl mx-auto mt-6 px-4">
+        <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-2" id="tabs-container">
+            <button onclick="switchTab('simpson')" id="btn-simpson" class="tab-btn flex items-center gap-2 px-6 py-3 rounded-t-lg font-medium transition-colors bg-white text-indigo-700 border-t-4 border-t-indigo-600 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <i data-lucide="bar-chart-3" class="w-[18px] h-[18px]"></i> פרדוקס סימפסון
+            </button>
+            <button onclick="switchTab('phacking')" id="btn-phacking" class="tab-btn flex items-center gap-2 px-6 py-3 rounded-t-lg font-medium transition-colors bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700">
+                <i data-lucide="search" class="w-[18px] h-[18px]"></i> ההאקר הסטטיסטי (P-Hacking)
+            </button>
+            <button onclick="switchTab('graphs')" id="btn-graphs" class="tab-btn flex items-center gap-2 px-6 py-3 rounded-t-lg font-medium transition-colors bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700">
+                <i data-lucide="trending-up" class="w-[18px] h-[18px]"></i> בית משפט לגרפים
+            </button>
+        </div>
+
+        <main class="py-8">
+            <!-- ================= MODULE 1: SIMPSON ================= -->
+            <div id="tab-simpson" class="tab-content active fade-in space-y-6">
+                <div class="bg-indigo-50 border-r-4 border-indigo-500 p-6 rounded-l-lg">
+                    <h2 class="text-2xl font-bold text-indigo-900 mb-2">מי מקפח את הנשים באוניברסיטת ברקלי?</h2>
+                    <p class="text-indigo-800 text-lg">
+                        <strong>המשימה שלכם:</strong> נתחו את נתוני הקבלה לאוניברסיטה. במבט ראשון, אחוז הקבלה של גברים גבוה משמעותית. 
+                        אבל מה קורה כשצוללים פנימה? שחקו עם כפתורי התצוגה ונסו לפצח את הפרדוקס. מהו המשתנה המתערב (Confounding Variable)?
+                    </p>
+                </div>
+
+                <div class="flex justify-center my-8">
+                    <div class="bg-slate-200 p-1 rounded-lg inline-flex">
+                        <button id="btn-view-overall" onclick="setSimpsonView('overall')" class="px-8 py-3 rounded-md font-bold transition-all bg-white shadow-sm text-indigo-700">
+                            תמונה כללית (כלל האוניברסיטה)
+                        </button>
+                        <button id="btn-view-dept" onclick="setSimpsonView('dept')" class="px-8 py-3 rounded-md font-bold transition-all text-slate-600 hover:text-slate-800">
+                            תמונה מחלקתית (רזולוציה גבוהה)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-8">
+                    
+                    <!-- Overall View -->
+                    <div id="view-overall" class="flex flex-col items-center justify-center space-y-8 fade-in">
+                        <h3 class="text-2xl font-bold text-slate-800 text-center">אחוזי קבלה כלליים</h3>
+                        <div class="flex justify-center gap-16 w-full max-w-3xl">
+                            <div class="flex flex-col items-center w-48">
+                                <div class="text-slate-500 mb-2 font-medium">גברים</div>
+                                <div class="h-64 w-24 bg-slate-100 rounded-t-lg relative flex flex-col justify-end border border-slate-300 overflow-hidden">
+                                    <div class="bg-sky-500 w-full transition-all duration-1000" style="height: 44%"></div>
+                                </div>
+                                <div class="mt-4 text-3xl font-bold text-sky-600">44%</div>
+                                <div class="text-sm text-slate-500 mt-1">התקבלו מתוך 8442</div>
+                            </div>
+                            <div class="flex flex-col items-center w-48">
+                                <div class="text-slate-500 mb-2 font-medium">נשים</div>
+                                <div class="h-64 w-24 bg-slate-100 rounded-t-lg relative flex flex-col justify-end border border-slate-300 overflow-hidden">
+                                    <div class="bg-rose-500 w-full transition-all duration-1000" style="height: 35%"></div>
+                                </div>
+                                <div class="mt-4 text-3xl font-bold text-rose-600">35%</div>
+                                <div class="text-sm text-slate-500 mt-1">התקבלו מתוך 4321</div>
+                            </div>
+                        </div>
+                        <div class="bg-rose-50 text-rose-800 p-4 rounded-lg flex items-center gap-3 w-full max-w-3xl">
+                            <i data-lucide="alert-triangle"></i>
+                            <p class="font-medium">לכאורה, הטיה ברורה! גברים מתקבלים באחוזים גבוהים בהרבה (44% לעומת 35%).</p>
+                        </div>
+                    </div>
+
+                    <!-- Department View -->
+                    <div id="view-dept" class="fade-in" style="display: none;">
+                        <h3 class="text-2xl font-bold text-slate-800 text-center mb-8">אחוזי קבלה לפי מחלקה</h3>
+                        <div id="dept-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Filled by JS -->
+                        </div>
+                        <div class="mt-8 bg-emerald-50 text-emerald-800 p-4 rounded-lg flex gap-3">
+                            <i data-lucide="search" class="shrink-0 mt-1"></i>
+                            <div>
+                                <p class="font-bold text-lg">שימו לב למספרים!</p>
+                                <p>ברוב המוחלט של המחלקות, נשים מתקבלות באחוזים <strong>שווים או גבוהים</strong> יותר מגברים. איך זה הגיוני? הסתכלו על כמות המגישים (גודל המדגם) בכל מחלקה. לאן נשים נוטות להגיש מועמדות (למשל, ספרות אנגלית שמאוד קשה להתקבל אליה)? לאן גברים (למשל, הנדסה שיותר קלה לקבלה במדגם הזה)? <br/>המשתנה המתערב (Confounding Variable) כאן הוא <strong>בחירת המחלקה</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= MODULE 2: P-HACKING ================= -->
+            <div id="tab-phacking" class="tab-content fade-in space-y-6">
+                <div class="bg-emerald-50 border-r-4 border-emerald-500 p-6 rounded-l-lg">
+                    <h2 class="text-2xl font-bold text-emerald-900 mb-2">ההאקר הסטטיסטי: ציידי ה-P-Value</h2>
+                    <p class="text-emerald-800 text-lg">
+                        <strong>המשימה שלכם:</strong> לפניכם מאגר נתונים <strong>אקראי לחלוטין</strong> של 50 תלמידים. 
+                        נסו לבחור זוגות של משתנים עד שתמצאו קשר "מובהק סטטיסטית" (p &lt; 0.05). 
+                        המטרה: לייצר את הכותרת הכי מגוחכת לעיתון שמוכחת מדעית לכאורה!
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col space-y-6 bg-slate-50">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">בחר משתנה ציר X</label>
+                            <div class="relative">
+                                <select id="select-x" onchange="updatePHacking()" class="w-full appearance-none bg-white border border-slate-300 rounded-lg py-3 px-4 pr-8 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                    <!-- Filled by JS -->
+                                </select>
+                                <i data-lucide="chevron-down" class="absolute left-3 top-3.5 text-slate-400 w-[18px] h-[18px]"></i>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">בחר משתנה ציר Y</label>
+                            <div class="relative">
+                                <select id="select-y" onchange="updatePHacking()" class="w-full appearance-none bg-white border border-slate-300 rounded-lg py-3 px-4 pr-8 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                    <!-- Filled by JS -->
+                                </select>
+                                <i data-lucide="chevron-down" class="absolute left-3 top-3.5 text-slate-400 w-[18px] h-[18px]"></i>
+                            </div>
+                        </div>
+              
+                        <button onclick="generatePHackingData()" class="mt-auto flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-lg font-medium transition-colors">
+                            <i data-lucide="refresh-cw" class="w-[18px] h-[18px]"></i>
+                            אסוף נתונים חדשים (אוכלוסייה חדשה)
+                        </button>
+                    </div>
+
+                    <div class="col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col items-center">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4">פיזור נתונים</h3>
+                        
+                        <div class="relative w-full max-w-md aspect-square bg-white border-l-2 border-b-2 border-slate-400" id="scatter-plot">
+                            <!-- Filled by JS -->
+                            <div id="lbl-x" class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-sm text-slate-500 font-medium"></div>
+                            <div id="lbl-y" class="absolute -left-8 top-1/2 transform -translate-y-1/2 -rotate-90 text-sm text-slate-500 font-medium whitespace-nowrap"></div>
+                        </div>
+
+                        <div id="phacking-results" class="mt-12 w-full p-4 rounded-xl text-center border-2 transition-all duration-300 bg-slate-50 border-slate-200">
+                            <div class="flex justify-around items-center">
+                                <div>
+                                    <p class="text-sm text-slate-500 mb-1">מקדם מתאם (r)</p>
+                                    <p id="res-r" class="text-2xl font-mono font-bold text-slate-800">0.00</p>
+                                </div>
+                                <div class="h-12 w-px bg-slate-300"></div>
+                                <div>
+                                    <p class="text-sm text-slate-500 mb-1">P-Value</p>
+                                    <p id="res-p" class="text-2xl font-mono font-bold text-slate-800">1.000</p>
+                                </div>
+                            </div>
+                            
+                            <div id="phacking-alert" class="hidden mt-4 pt-4 border-t border-amber-200 fade-in">
+                                <p class="font-black text-xl text-amber-700 mb-2">🚨 בינגו! יש כותרת לעיתון 🚨</p>
+                                <p id="phacking-headline" class="text-amber-900 italic font-serif text-lg"></p>
+                                <p class="text-xs text-amber-700/70 mt-2">
+                                    (למרות שייצרנו את הנתונים באופן אקראי לחלוטין. ברוכים הבאים לבעיית ההשוואות המרובות).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= MODULE 3: GRAPHS ================= -->
+            <div id="tab-graphs" class="tab-content fade-in space-y-6">
+                <div class="bg-amber-50 border-r-4 border-amber-500 p-6 rounded-l-lg">
+                    <h2 class="text-2xl font-bold text-amber-900 mb-2">בית משפט לגרפים: סניגור מול קטגור</h2>
+                    <p class="text-amber-800 text-lg">
+                        <strong>המשימה שלכם:</strong> לפניכם נתונים של הישגי בית הספר בשנים האחרונות. 
+                        אתם נדרשים לשנות את דרך ההצגה (מבלי לזייף את הנתונים עצמם!) כדי לספר שני סיפורים שונים לחלוטין.
+                        האם המצב "יציב ומשעמם" או "מזנק בצורה דרמטית"?
+                    </p>
+                </div>
+          
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div class="col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-6 bg-slate-50 flex flex-col gap-6">
+                        <h3 class="font-bold text-slate-800 border-b pb-2">ארגז הכלים של הספינר</h3>
+                        
+                        <label class="flex items-start gap-3 cursor-pointer group">
+                            <div class="relative flex items-center">
+                                <input type="checkbox" id="chk-truncate" onchange="renderGraph()" class="sr-only" />
+                                <div id="ui-truncate-bg" class="w-10 h-6 rounded-full bg-slate-300 transition-colors"></div>
+                                <div id="ui-truncate-dot" class="absolute w-4 h-4 rounded-full bg-white transition-transform translate-x-5 left-1"></div>
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-700 group-hover:text-amber-600 transition-colors">חיתוך ציר Y</div>
+                                <div class="text-xs text-slate-500">התחל מ-80 במקום מ-0</div>
+                            </div>
+                        </label>
+              
+                        <label class="flex items-start gap-3 cursor-pointer group">
+                            <div class="relative flex items-center">
+                                <input type="checkbox" id="chk-trendline" onchange="renderGraph()" checked class="sr-only" />
+                                <div id="ui-trend-bg" class="w-10 h-6 rounded-full bg-indigo-500 transition-colors"></div>
+                                <div id="ui-trend-dot" class="absolute w-4 h-4 rounded-full bg-white transition-transform translate-x-1 left-1"></div>
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">קו מגמה</div>
+                                <div id="lbl-trend-desc" class="text-xs text-slate-500">קו רגרסיה לינארית (פעיל)</div>
+                            </div>
+                        </label>
+                    </div>
+            
+                    <div class="col-span-3 bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+                        <div class="text-center mb-8">
+                            <h3 id="graph-title" class="text-3xl font-black mb-2 transition-colors duration-500 text-slate-600">
+                                יציבות מתמשכת בהישגי התלמידים
+                            </h3>
+                            <p class="text-slate-500">מדד הציונים השנתי 2016-2023</p>
+                        </div>
+              
+                        <div class="relative w-full h-80 bg-white mx-auto" style="max-width: 800px;">
+                            <div id="graph-y-axis" class="absolute right-0 top-0 bottom-8 w-12 flex flex-col justify-between text-xs text-slate-400 items-end pr-2 border-r border-slate-200">
+                                <!-- Filled by JS -->
+                            </div>
+                            <div class="absolute right-12 left-0 top-0 bottom-8 flex flex-col justify-between">
+                                <div class="w-full h-px bg-slate-100"></div><div class="w-full h-px bg-slate-100"></div>
+                                <div class="w-full h-px bg-slate-100"></div><div class="w-full h-px bg-slate-100"></div>
+                                <div class="w-full h-px bg-slate-100"></div>
+                            </div>
+              
+                            <!-- SVG Chart -->
+                            <div id="graph-svg-container" class="absolute right-12 left-0 top-0 w-[calc(100%-3rem)] h-[calc(100%-2rem)] overflow-visible"></div>
+                            
+                            <!-- Ref Line Label -->
+                            <div id="graph-ref-label" class="absolute left-0 text-xs font-bold transition-all duration-1000 px-2 py-1 rounded shadow-sm bg-white border" style="transform: translateY(-50%);"></div>
+              
+                            <div class="absolute right-12 left-0 bottom-0 flex justify-between text-xs text-slate-500 transform translate-y-full pt-2" dir="ltr">
+                                <span>2016</span><span>2017</span><span>2018</span><span>2019</span>
+                                <span>2020</span><span>2021</span><span>2022</span><span>2023</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-16 text-center text-sm text-slate-500 bg-slate-50 p-3 rounded">
+                            <strong>מסקנה לכיתה:</strong> הנתונים הם אותם נתונים בדיוק (82 עד 86). שינוי קטן בקנה המידה (סולם ה-Y) משנה את הרגש ואת המסר שהמוח שלנו קולט מהגרף תוך חלקיק שניה.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // --- Tabs Logic ---
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            
+            // Reset buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn flex items-center gap-2 px-6 py-3 rounded-t-lg font-medium transition-colors bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700';
+            });
+            // Activate clicked button
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.className = 'tab-btn flex items-center gap-2 px-6 py-3 rounded-t-lg font-medium transition-colors bg-white text-indigo-700 border-t-4 border-t-indigo-600 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]';
+        }
+
+        // --- Module 1: Simpson ---
+        const deptData = [
+            { name: 'הנדסת מכונות (קלה לקבלה)', men: { app: 825, acc: 62 }, women: { app: 108, acc: 82 } },
+            { name: 'כימיה ופיזיקה', men: { app: 560, acc: 63 }, women: { app: 25, acc: 68 } },
+            { name: 'מדעי המדינה', men: { app: 325, acc: 37 }, women: { app: 593, acc: 34 } },
+            { name: 'פסיכולוגיה', men: { app: 417, acc: 33 }, women: { app: 375, acc: 35 } },
+            { name: 'שפות ובלשנות', men: { app: 191, acc: 28 }, women: { app: 393, acc: 24 } },
+            { name: 'ספרות אנגלית (קשה לקבלה)', men: { app: 373, acc: 6 }, women: { app: 341, acc: 7 } },
+        ];
+
+        function initSimpson() {
+            const grid = document.getElementById('dept-grid');
+            let html = '';
+            deptData.forEach(dept => {
+                const checkIcon = dept.women.acc >= dept.men.acc ? `<div class="absolute top-2 left-2 text-emerald-500"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>` : '';
+                html += `
+                <div class="border border-slate-200 rounded-lg p-5 bg-slate-50 relative">
+                    ${checkIcon}
+                    <h4 class="font-bold text-slate-700 mb-4 text-center">${dept.name}</h4>
+                    <div class="flex justify-around items-end h-32 mb-4">
+                        <div class="flex flex-col items-center">
+                            <div class="h-24 w-12 bg-slate-200 rounded-t-sm relative flex flex-col justify-end">
+                                <div class="bg-sky-400 w-full" style="height: ${dept.men.acc}%"></div>
+                            </div>
+                            <span class="font-bold text-sky-700 mt-2">${dept.men.acc}%</span>
+                            <span class="text-xs text-slate-500">גברים</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="h-24 w-12 bg-slate-200 rounded-t-sm relative flex flex-col justify-end">
+                                <div class="bg-rose-400 w-full" style="height: ${dept.women.acc}%"></div>
+                            </div>
+                            <span class="font-bold text-rose-700 mt-2">${dept.women.acc}%</span>
+                            <span class="text-xs text-slate-500">נשים</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-500 text-center border-t border-slate-200 pt-2 mt-2">
+                        הגישו: ${dept.men.app} גברים | ${dept.women.app} נשים
+                    </div>
+                </div>`;
+            });
+            grid.innerHTML = html;
+            lucide.createIcons(); // Re-render newly added icons
+        }
+
+        function setSimpsonView(view) {
+            document.getElementById('view-overall').style.display = view === 'overall' ? 'flex' : 'none';
+            document.getElementById('view-dept').style.display = view === 'dept' ? 'block' : 'none';
+            
+            document.getElementById('btn-view-overall').className = `px-8 py-3 rounded-md font-bold transition-all ${view === 'overall' ? 'bg-white shadow-sm text-indigo-700' : 'text-slate-600 hover:text-slate-800'}`;
+            document.getElementById('btn-view-dept').className = `px-8 py-3 rounded-md font-bold transition-all ${view === 'dept' ? 'bg-white shadow-sm text-indigo-700' : 'text-slate-600 hover:text-slate-800'}`;
+        }
+
+
+        // --- Module 2: P-Hacking ---
+        const phackVars = [
+            'אכילת במבה שבועית (גרם)', 'ציון ממוצע במתמטיקה', 'זמן מסך יומי (דקות)', 
+            'מספר חתולי רחוב שראו היום', 'שעות שינה בלילה', 'מידת נעליים', 
+            'גובה קפיצה (ס"מ)', 'כמות פיצה שנאכלה בחודש', 'אורך השם המלא (אותיות)', 'זמן הגעה לבית הספר'
+        ];
+        let pData = [];
+
+        function initPHacking() {
+            const selectX = document.getElementById('select-x');
+            const selectY = document.getElementById('select-y');
+            let opts = phackVars.map(v => `<option value="${v}">${v}</option>`).join('');
+            selectX.innerHTML = opts;
+            selectY.innerHTML = opts;
+            selectY.selectedIndex = 1;
+            generatePHackingData();
+        }
+
+        function generatePHackingData() {
+            pData = [];
+            let baseArrays = {};
+            phackVars.forEach(v => {
+                baseArrays[v] = Array.from({length: 50}, () => Math.random() * 100);
+            });
+            if (Math.random() > 0.5) {
+                const v1 = phackVars[Math.floor(Math.random() * phackVars.length)];
+                const v2 = phackVars[Math.floor(Math.random() * phackVars.length)];
+                if (v1 !== v2) {
+                    baseArrays[v2] = baseArrays[v1].map(val => val + (Math.random() * 40 - 20));
+                }
+            }
+            for (let i = 0; i < 50; i++) {
+                let student = { id: i };
+                phackVars.forEach(v => { student[v] = baseArrays[v][i]; });
+                pData.push(student);
+            }
+            updatePHacking();
+        }
+
+        function updatePHacking() {
+            const varX = document.getElementById('select-x').value;
+            const varY = document.getElementById('select-y').value;
+            
+            document.getElementById('lbl-x').innerText = varX;
+            document.getElementById('lbl-y').innerText = varY;
+
+            const xs = pData.map(d => d[varX]);
+            const ys = pData.map(d => d[varY]);
+            
+            // Draw scatter plot
+            const minX = Math.min(...xs), maxX = Math.max(...xs);
+            const minY = Math.min(...ys), maxY = Math.max(...ys);
+            
+            let scatterHtml = '';
+            pData.forEach(d => {
+                const cx = maxX === minX ? 50 : ((d[varX] - minX) / (maxX - minX)) * 100;
+                const cy = maxY === minY ? 50 : 100 - (((d[varY] - minY) / (maxY - minY)) * 100);
+                scatterHtml += `<div class="absolute w-2 h-2 rounded-full bg-emerald-500 opacity-60 transform -translate-x-1 -translate-y-1" style="left: ${cx}%; top: ${cy}%;"></div>`;
+            });
+            
+            // Keep labels
+            scatterHtml += document.getElementById('lbl-x').outerHTML;
+            scatterHtml += document.getElementById('lbl-y').outerHTML;
+            document.getElementById('scatter-plot').innerHTML = scatterHtml;
+
+            // Calculate correlation
+            const meanX = xs.reduce((a, b) => a + b, 0) / xs.length;
+            const meanY = ys.reduce((a, b) => a + b, 0) / ys.length;
+            let num = 0, denX = 0, denY = 0;
+            for (let i = 0; i < xs.length; i++) {
+                num += (xs[i] - meanX) * (ys[i] - meanY);
+                denX += Math.pow(xs[i] - meanX, 2);
+                denY += Math.pow(ys[i] - meanY, 2);
+            }
+            let r = num / Math.sqrt(denX * denY);
+            if (isNaN(r)) r = 0;
+            
+            // Calculate p-value
+            const t = r * Math.sqrt(48 / (1 - r * r));
+            const p = Math.exp(-0.5 * t * t);
+            const finalP = p > 1 ? 1 : p;
+            const isSig = finalP < 0.05;
+
+            document.getElementById('res-r').innerText = r.toFixed(2);
+            document.getElementById('res-p').innerText = finalP < 0.001 ? '< 0.001' : finalP.toFixed(3);
+            
+            const resultsBox = document.getElementById('phacking-results');
+            const alertBox = document.getElementById('phacking-alert');
+            const pText = document.getElementById('res-p');
+            
+            if (isSig) {
+                resultsBox.className = 'mt-12 w-full p-4 rounded-xl text-center border-2 transition-all duration-300 bg-amber-50 border-amber-400 shadow-lg';
+                pText.className = 'text-2xl font-mono font-bold text-amber-600';
+                document.getElementById('phacking-headline').innerText = `"מחקר חדש קובע: קשר מובהק בין ${varX} לבין ${varY}!"`;
+                alertBox.classList.remove('hidden');
+            } else {
+                resultsBox.className = 'mt-12 w-full p-4 rounded-xl text-center border-2 transition-all duration-300 bg-slate-50 border-slate-200';
+                pText.className = 'text-2xl font-mono font-bold text-slate-800';
+                alertBox.classList.add('hidden');
+            }
+        }
+
+        // --- Module 3: Graphs ---
+        const gData = [82, 83, 82, 84, 83, 85, 84, 86];
+        
+        // חישוב משתני רגרסיה לינארית (Least Squares)
+        let _sumX = 0, _sumY = 0, _sumXY = 0, _sumXX = 0;
+        const _n = gData.length;
+        for (let i = 0; i < _n; i++) {
+            _sumX += i;
+            _sumY += gData[i];
+            _sumXY += i * gData[i];
+            _sumXX += i * i;
+        }
+        const gSlope = (_n * _sumXY - _sumX * _sumY) / (_n * _sumXX - _sumX * _sumX);
+        const gIntercept = (_sumY - gSlope * _sumX) / _n;
+
+        function renderGraph() {
+            const isTrunc = document.getElementById('chk-truncate').checked;
+            const showTrend = document.getElementById('chk-trendline').checked;
+            
+            // Update UI Toggles visually
+            document.getElementById('ui-truncate-bg').className = `w-10 h-6 rounded-full transition-colors ${isTrunc ? 'bg-amber-500' : 'bg-slate-300'}`;
+            document.getElementById('ui-truncate-dot').className = `absolute w-4 h-4 rounded-full bg-white transition-transform left-1 ${isTrunc ? 'translate-x-1' : 'translate-x-5'}`;
+            
+            document.getElementById('ui-trend-bg').className = `w-10 h-6 rounded-full transition-colors ${showTrend ? 'bg-indigo-500' : 'bg-slate-300'}`;
+            document.getElementById('ui-trend-dot').className = `absolute w-4 h-4 rounded-full bg-white transition-transform left-1 ${showTrend ? 'translate-x-1' : 'translate-x-5'}`;
+            document.getElementById('lbl-trend-desc').innerText = showTrend ? 'קו רגרסיה לינארית (מוצג)' : 'ללא קו מגמה';
+
+            const minY = isTrunc ? 80 : 0;
+            const maxY = isTrunc ? 88 : 100;
+            const chartColor = isTrunc ? '#ef4444' : '#64748b';
+            const refColor = '#6366f1';
+            
+            const title = document.getElementById('graph-title');
+            title.innerText = isTrunc ? 'זינוק דרמטי וחסר תקדים בהישגים!' : 'יציבות מתמשכת בהישגי התלמידים';
+            title.className = `text-3xl font-black mb-2 transition-colors duration-500 ${isTrunc ? 'text-red-600' : 'text-slate-600'}`;
+
+            // Update Y-Axis
+            document.getElementById('graph-y-axis').innerHTML = `
+                <span>${maxY}</span>
+                <span>${minY + (maxY - minY) * 0.75}</span>
+                <span>${minY + (maxY - minY) * 0.5}</span>
+                <span>${minY + (maxY - minY) * 0.25}</span>
+                <span>${minY}</span>
+            `;
+
+            // Calculate SVG elements
+            let pointsHtml = '';
+            let circleHtml = '';
+            gData.forEach((val, i) => {
+                const x = (i / (_n - 1)) * 100;
+                const y = 100 - (((val - minY) / (maxY - minY)) * 100);
+                pointsHtml += `${x}%,${y}% `;
+                circleHtml += `<circle cx="${x}%" cy="${y}%" r="5" fill="white" stroke="${chartColor}" stroke-width="3" class="transition-all duration-1000"></circle>`;
+            });
+
+            // Calculate Trendline (Regression) Y positions
+            let trendLineHtml = '';
+            const startYVal = gIntercept;
+            const endYVal = gIntercept + gSlope * (_n - 1);
+            
+            const startYPct = 100 - (((startYVal - minY) / (maxY - minY)) * 100);
+            const endYPct = 100 - (((endYVal - minY) / (maxY - minY)) * 100);
+
+            if (showTrend) {
+                trendLineHtml = `<line x1="0" x2="100%" y1="${startYPct}%" y2="${endYPct}%" stroke="${refColor}" stroke-width="2" stroke-dasharray="5,5" class="transition-all duration-1000"></line>`;
+            }
+
+            document.getElementById('graph-svg-container').innerHTML = `
+                <svg width="100%" height="100%" style="overflow: visible;">
+                    <defs>
+                        <linearGradient id="gradientArea" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stop-color="${chartColor}" stop-opacity="0.2" />
+                            <stop offset="100%" stop-color="${chartColor}" stop-opacity="0" />
+                        </linearGradient>
+                    </defs>
+                    <polyline fill="none" stroke="${chartColor}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="transition-all duration-1000" points="${pointsHtml}"></polyline>
+                    ${trendLineHtml}
+                    ${circleHtml}
+                </svg>
+            `;
+
+            const refLabel = document.getElementById('graph-ref-label');
+            if (showTrend) {
+                refLabel.style.opacity = '1';
+                // ממקם את התגית בגובה שבו קו הרגרסיה מתחיל (משמאל)
+                refLabel.style.top = `${startYPct}%`;
+                refLabel.style.borderColor = refColor;
+                refLabel.style.color = refColor;
+                refLabel.innerText = `קו מגמה (רגרסיה)`;
+            } else {
+                refLabel.style.opacity = '0';
+            }
+        }
+
+        // Initialize everything on load
+        window.onload = () => {
+            initSimpson();
+            initPHacking();
+            renderGraph();
+        };
+    </script>
+</body>
+</html>

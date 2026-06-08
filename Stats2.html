@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חדר הבקרה הסטטיסטי</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #050505;
+            color: #e5e5e5;
+            background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #050505 70%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .number-transition {
+            transition: all 1s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // UI Components
+        const Button = ({ children, onClick, variant = 'primary', disabled = false, className = '' }) => {
+            const baseStyle = "px-6 py-3 rounded-lg font-bold transition-all duration-300 transform shadow-lg text-lg flex items-center justify-center gap-2 ";
+            const variants = {
+                primary: "bg-blue-600 hover:bg-blue-500 text-white hover:-translate-y-1 hover:shadow-blue-500/50",
+                danger: "bg-red-600 hover:bg-red-500 text-white hover:-translate-y-1 hover:shadow-red-500/50",
+                success: "bg-emerald-600 hover:bg-emerald-500 text-white hover:-translate-y-1 hover:shadow-emerald-500/50",
+                outline: "border-2 border-slate-500 hover:border-slate-300 hover:bg-slate-800 text-slate-300"
+            };
+            const disabledStyle = disabled ? "opacity-50 cursor-not-allowed transform-none hover:transform-none hover:shadow-none" : "";
+            
+            return (
+                <button onClick={onClick} disabled={disabled} className={`${baseStyle} ${variants[variant]} ${disabledStyle} ${className}`}>
+                    {children}
+                </button>
+            );
+        };
+
+        // --- Activity 1: FDA Simulator (Type I & II Errors) ---
+        const FDASimulator = ({ onBack }) => {
+            const [step, setStep] = useState(0); // 0: intro, 1: decision, 2: result
+            const [decision, setDecision] = useState(null);
+            
+            const scenario = {
+                title: "תרופה חדשה לסרטן (X-99)",
+                nullHypothesis: "H0: התרופה אינה יעילה (שווה לפלצבו).",
+                altHypothesis: "H1: התרופה יעילה ומרפאת חולים.",
+                context: "מחקר קליני הראה שהתרופה עוזרת למעט יותר אנשים מפלצבו, עם P-Value של 0.049. עם זאת, לתרופה יש תופעות לוואי קשות.",
+                truth: "H0 is true" // In absolute secret reality, the drug doesn't actually work.
+            };
+
+            const handleDecision = (choice) => {
+                setDecision(choice);
+                setStep(2);
+            };
+
+            const getResult = () => {
+                if (decision === 'reject_h0' && scenario.truth === "H0 is true") {
+                    return {
+                        title: "עשית טעות מסוג ראשון (Type I Error - α)!",
+                        desc: "דחית את השערת האפס כשהיא הייתה נכונה. אישרת תרופה שלא באמת עובדת, וחשפת חולים לתופעות לוואי לחינם.",
+                        color: "text-red-500", border: "border-red-500", bg: "bg-red-900/20"
+                    };
+                } else if (decision === 'accept_h0' && scenario.truth === "H1 is true") {
+                    return {
+                        title: "עשית טעות מסוג שני (Type II Error - β)!",
+                        desc: "לא דחית את השערת האפס כשהיא הייתה שגויה. פסלת תרופה שבאמת עובדת, ומנעת תרופה מצילת חיים מחולים.",
+                        color: "text-orange-500", border: "border-orange-500", bg: "bg-orange-900/20"
+                    };
+                } else if (decision === 'accept_h0' && scenario.truth === "H0 is true") {
+                    return {
+                        title: "החלטה נכונה!",
+                        desc: "צדקת! לא דחית את השערת האפס. התרופה באמת לא עבדה, והצלת את הציבור מתופעות לוואי מיותרות.",
+                        color: "text-emerald-500", border: "border-emerald-500", bg: "bg-emerald-900/20"
+                    };
+                }
+            };
+
+            return (
+                <div className="animate-fade-in space-y-6 max-w-4xl mx-auto">
+                    <div className="flex justify-between items-center mb-8">
+                        <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
+                            ⚖️ סימולטור מנהל ה-FDA
+                        </h2>
+                        <Button variant="outline" onClick={onBack}>חזור</Button>
+                    </div>
+
+                    <div className="glass-card p-8 rounded-2xl relative overflow-hidden">
+                        {step === 0 && (
+                            <div className="space-y-6 text-center animate-fade-in">
+                                <h3 className="text-2xl font-bold">אתה ראש סוכנות התרופות. חיי אדם בידיים שלך.</h3>
+                                <p className="text-xl text-slate-300">
+                                    תמיד יש סיכוי לטעות הסטטיסטית. האם עדיף לאשר תרופה מסוכנת שלא עובדת (טעות מסוג I), או לדחות תרופה מצילת חיים שכן עובדת (טעות מסוג II)?
+                                </p>
+                                <Button onClick={() => setStep(1)} className="mx-auto mt-8">הבא לי את התיק הרפואי הבא</Button>
+                            </div>
+                        )}
+
+                        {step === 1 && (
+                            <div className="space-y-8 animate-fade-in">
+                                <div className="bg-slate-900 p-6 rounded-xl border-l-4 border-blue-500">
+                                    <h3 className="text-3xl font-bold mb-4">{scenario.title}</h3>
+                                    <p className="text-lg text-slate-400 mb-2"><strong>השערת האפס:</strong> {scenario.nullHypothesis}</p>
+                                    <p className="text-lg text-slate-400 mb-6"><strong>השערת החוקר:</strong> {scenario.altHypothesis}</p>
+                                    <p className="text-xl">{scenario.context}</p>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <Button variant="success" onClick={() => handleDecision('reject_h0')} className="h-32 flex-col">
+                                        <span className="text-2xl">✅ לאשר את התרופה</span>
+                                        <span className="text-sm opacity-80">(לדחות את השערת האפס H0)</span>
+                                    </Button>
+                                    <Button variant="danger" onClick={() => handleDecision('accept_h0')} className="h-32 flex-col">
+                                        <span className="text-2xl">❌ לפסול את התרופה</span>
+                                        <span className="text-sm opacity-80">(לא לדחות את השערת האפס H0)</span>
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
+                        {step === 2 && (
+                            <div className={`p-8 rounded-xl border-2 animate-fade-in ${getResult().bg} ${getResult().border}`}>
+                                <h3 className={`text-4xl font-black mb-4 ${getResult().color}`}>
+                                    {getResult().title}
+                                </h3>
+                                <p className="text-2xl mb-8">{getResult().desc}</p>
+                                <p className="text-slate-400 text-lg mb-8">
+                                    <strong>המציאות הנסתרת (The Ground Truth):</strong> התרופה הזו הייתה למעשה מים עם צבע מאכל, והתוצאות בניסוי יצאו מובהקות רק במקרה.
+                                </p>
+                                <Button variant="outline" onClick={() => {setStep(0); setDecision(null);}} className="mx-auto">
+                                    שחק שוב עם תרופה אחרת
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Activity 2: The Billionaire Effect (Mean vs Median) ---
+        const OutlierEffect = ({ onBack }) => {
+            const [salaries, setSalaries] = useState([10000, 11000, 12000, 13000, 14000]);
+            const [outlierAdded, setOutlierAdded] = useState(false);
+
+            const calcMean = (arr) => Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
+            const calcMedian = (arr) => {
+                const sorted = [...arr].sort((a, b) => a - b);
+                const mid = Math.floor(sorted.length / 2);
+                return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+            };
+
+            const addElon = () => {
+                setSalaries([...salaries, 5000000]);
+                setOutlierAdded(true);
+            };
+
+            const reset = () => {
+                setSalaries([10000, 11000, 12000, 13000, 14000]);
+                setOutlierAdded(false);
+            };
+
+            return (
+                <div className="animate-fade-in space-y-6 max-w-5xl mx-auto">
+                    <div className="flex justify-between items-center mb-8">
+                        <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">
+                            💰 אפקט הביליונר בבר
+                        </h2>
+                        <Button variant="outline" onClick={onBack}>חזור</Button>
+                    </div>
+
+                    <div className="glass-card p-8 rounded-2xl">
+                        <p className="text-xl mb-8 text-center text-slate-300">
+                            5 חברים יושבים בבר. הנה המשכורות החודשיות שלהם.
+                            שימו לב להבדל בין ה<strong>ממוצע</strong> ל<strong>חציון</strong> כאשר אדם עשיר במיוחד נכנס לבר. מדד המרכז המייצג באמת משתנה!
+                        </p>
+
+                        <div className="flex flex-wrap justify-center gap-4 mb-12">
+                            {salaries.map((s, i) => (
+                                <div key={i} className={`p-4 rounded-xl border ${s > 100000 ? 'bg-emerald-900 border-emerald-400 scale-110 shadow-[0_0_30px_rgba(52,211,153,0.5)]' : 'bg-slate-800 border-slate-600'} flex flex-col items-center justify-center min-w-[120px] transition-all duration-500`}>
+                                    <span className="text-3xl mb-2">{s > 100000 ? '🎩' : '🧑‍💻'}</span>
+                                    <span className="font-mono text-xl font-bold">₪{s.toLocaleString()}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-8 mb-12">
+                            <div className="bg-slate-900/80 p-8 rounded-2xl border-l-8 border-blue-500 text-center">
+                                <h3 className="text-2xl text-slate-400 mb-2">ממוצע (Mean)</h3>
+                                <div className="text-5xl font-mono font-black text-blue-400 number-transition">
+                                    ₪{calcMean(salaries).toLocaleString()}
+                                </div>
+                                {outlierAdded && <p className="text-red-400 mt-4 font-bold animate-pulse">הממוצע נהרס! הוא כבר לא מייצג אף אחד בחדר.</p>}
+                            </div>
+                            <div className="bg-slate-900/80 p-8 rounded-2xl border-r-8 border-purple-500 text-center">
+                                <h3 className="text-2xl text-slate-400 mb-2">חציון (Median)</h3>
+                                <div className="text-5xl font-mono font-black text-purple-400 number-transition">
+                                    ₪{calcMedian(salaries).toLocaleString()}
+                                </div>
+                                {outlierAdded && <p className="text-emerald-400 mt-4 font-bold">החציון עמיד לערכי קיצון (Robust). הוא עדיין מייצג!</p>}
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center gap-6">
+                            {!outlierAdded ? (
+                                <Button variant="success" onClick={addElon} className="text-2xl py-4 px-8">
+                                    💸 הכנס את אילון מאסק לבר!
+                                </Button>
+                            ) : (
+                                <Button variant="danger" onClick={reset} className="text-2xl py-4 px-8">
+                                    🚪 גרש את אילון מהבר
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Activity 3: Research Architect ---
+        const ResearchBuilder = ({ onBack }) => {
+            const [currentQ, setCurrentQ] = useState(0);
+            const [selectedIndep, setSelectedIndep] = useState(null);
+            const [selectedDep, setSelectedDep] = useState(null);
+            const [selectedTest, setSelectedTest] = useState(null);
+            const [showFeedback, setShowFeedback] = useState(false);
+
+            // Based on scenarios from your "Statistics Alpha 2025.pptx" slide
+            const cases = [
+                {
+                    title: "מחקר לחץ דם",
+                    desc: "חוקר בודק השפעת תרופה ללחץ דם. הוא חילק באקראי נסיינים לקבוצת ביקורת (פלצבו) וקבוצת מבחן (תרופה אמיתית), ומדד את לחץ הדם של שתי הקבוצות.",
+                    options: {
+                        indep: ["לחץ דם", "סוג הטיפול (פלצבו/תרופה)", "גיל הנסיינים"],
+                        dep: ["לחץ דם", "סוג הטיפול (פלצבו/תרופה)", "מין הנסיין"],
+                        tests: ["מבחן T למדגמים בלתי תלויים", "מבחן T למדגמים מזווגים (מצומדים)"]
+                    },
+                    answers: { indep: "סוג הטיפול (פלצבו/תרופה)", dep: "לחץ דם", test: "מבחן T למדגמים בלתי תלויים" },
+                    explanation: "מצוין! סוג הטיפול הוא המשתנה הבלתי תלוי (הוא משפיע), ולחץ הדם הוא המשתנה התלוי (המושפע). מכיוון שיש שתי קבוצות שונות של אנשים (ביקורת ומבחן), נשתמש במבחן T למדגמים בלתי תלויים."
+                },
+                {
+                    title: "מחקר ידע כללי (לפני ואחרי)",
+                    desc: "חוקר רצה לבדוק השפעה של קורס על הידע הכללי. הוא נתן לאותם סטודנטים מבחן ידע לפני הקורס, ומבחן ידע נוסף לאחר הקורס.",
+                    options: {
+                        indep: ["ציון המבחן", "זמן (לפני הקורס / אחרי הקורס)", "רמת המשכל של המרצה"],
+                        dep: ["ציון המבחן", "מספר הסטודנטים", "זמן (לפני/אחרי)"],
+                        tests: ["מבחן T למדגמים בלתי תלויים", "מבחן T למדגמים מזווגים (מצומדים)"]
+                    },
+                    answers: { indep: "זמן (לפני הקורס / אחרי הקורס)", dep: "ציון המבחן", test: "מבחן T למדגמים מזווגים (מצומדים)" },
+                    explanation: "מעולה! הזמן (לפני/אחרי) הוא המשתנה הבלתי תלוי שמשפיע על הציון (המשתנה התלוי). מכיוון שאלו אותם סטודנטים שנבדקו פעמיים, חובה להשתמש במבחן T למדגמים מזווגים/מצומדים (Paired T-Test) כדי לבדוק את ההפרש האישי של כל סטודנט!"
+                }
+            ];
+
+            const currentCase = cases[currentQ];
+            const isAllSelected = selectedIndep && selectedDep && selectedTest;
+            const isCorrect = isAllSelected && selectedIndep === currentCase.answers.indep && selectedDep === currentCase.answers.dep && selectedTest === currentCase.answers.test;
+
+            const checkAnswers = () => setShowFeedback(true);
+            
+            const nextCase = () => {
+                setSelectedIndep(null); setSelectedDep(null); setSelectedTest(null); setShowFeedback(false);
+                if (currentQ < cases.length - 1) setCurrentQ(currentQ + 1);
+                else { alert("סיימתם את כל המעבדות!"); onBack(); }
+            };
+
+            const SelectGroup = ({ title, options, selected, onSelect, colorClass }) => (
+                <div className={`p-6 rounded-xl border-2 ${colorClass} bg-opacity-10 mb-4`}>
+                    <h4 className="text-xl font-bold mb-4">{title}</h4>
+                    <div className="flex flex-col gap-3">
+                        {options.map(opt => (
+                            <button key={opt} 
+                                onClick={() => !showFeedback && onSelect(opt)}
+                                className={`text-right px-4 py-3 rounded-lg border transition-all ${selected === opt ? 'bg-white/20 border-white text-white font-bold' : 'bg-transparent border-slate-600 text-slate-400 hover:border-slate-400'} ${showFeedback ? 'cursor-default' : 'hover:bg-white/5'}`}>
+                                {opt}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="animate-fade-in space-y-6 max-w-6xl mx-auto">
+                    <div className="flex justify-between items-center mb-8">
+                        <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">
+                            🔬 ארכיטקט המחקר
+                        </h2>
+                        <Button variant="outline" onClick={onBack}>חזור</Button>
+                    </div>
+
+                    <div className="glass-card p-8 rounded-2xl">
+                        <div className="bg-indigo-900/40 border border-indigo-500/50 p-6 rounded-xl mb-8">
+                            <h3 className="text-3xl font-bold mb-3">{currentCase.title}</h3>
+                            <p className="text-xl text-indigo-200">{currentCase.desc}</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <SelectGroup title="1. בחרו משתנה בלתי-תלוי (X)" options={currentCase.options.indep} selected={selectedIndep} onSelect={setSelectedIndep} colorClass="border-blue-500 bg-blue-900" />
+                            <SelectGroup title="2. בחרו משתנה תלוי (Y)" options={currentCase.options.dep} selected={selectedDep} onSelect={setSelectedDep} colorClass="border-pink-500 bg-pink-900" />
+                            <SelectGroup title="3. בחרו את המבחן הסטטיסטי" options={currentCase.options.tests} selected={selectedTest} onSelect={setSelectedTest} colorClass="border-purple-500 bg-purple-900" />
+                        </div>
+
+                        {!showFeedback ? (
+                            <div className="text-center">
+                                <Button onClick={checkAnswers} disabled={!isAllSelected} className="text-2xl py-4 px-12 mx-auto">
+                                    בדוק את מערך המחקר
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className={`p-8 rounded-xl border-2 animate-fade-in ${isCorrect ? 'bg-emerald-900/40 border-emerald-500' : 'bg-red-900/40 border-red-500'}`}>
+                                <h3 className={`text-3xl font-bold mb-4 ${isCorrect ? 'text-emerald-400' : 'text-red-400'}`}>
+                                    {isCorrect ? '🎯 תכנון מדויק!' : '❌ יש טעות בתכנון המחקר'}
+                                </h3>
+                                <p className="text-xl mb-6">{isCorrect ? currentCase.explanation : "נסו לבדוק שוב מי משפיע על מי, והאם הנסיינים נבדקו פעם אחת (שתי קבוצות) או פעמיים (אותה קבוצה)."}</p>
+                                <Button variant={isCorrect ? 'success' : 'danger'} onClick={isCorrect ? nextCase : () => setShowFeedback(false)} className="mx-auto text-xl">
+                                    {isCorrect ? 'למחקר הבא' : 'נסה שוב'}
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- MAIN APP COMPONENT ---
+        const App = () => {
+            const [currentView, setCurrentView] = useState('menu');
+
+            const menuItems = [
+                { id: 'fda', title: 'סימולטור ה-FDA', icon: '💊', desc: 'קבלו החלטות וגלו את המשמעות של טעויות סטטיסטיות מסוג ראשון ושני.', color: 'from-red-600 to-orange-500' },
+                { id: 'outlier', title: 'אפקט הביליונר', icon: '💎', desc: 'משחקים עם נתונים ורואים בזמן אמת למה הממוצע שקרן והחציון חסין.', color: 'from-emerald-500 to-teal-400' },
+                { id: 'research', title: 'ארכיטקט המחקר', icon: '🧬', desc: 'בנו את מערך המחקר הנכון: זהו משתנים והתאימו את מבחן ה-T המדויק.', color: 'from-blue-600 to-indigo-500' }
+            ];
+
+            return (
+                <div className="min-h-screen p-6 md:p-12">
+                    {currentView === 'menu' && (
+                        <div className="max-w-6xl mx-auto animate-fade-in">
+                            <header className="text-center mb-16">
+                                <h1 className="text-6xl font-black mb-4 tracking-tight">
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
+                                        חדר הבקרה הסטטיסטי
+                                    </span>
+                                </h1>
+                                <p className="text-2xl text-slate-400 font-light">תכנית אלפא - מעבדת חקירה מתקדמת</p>
+                            </header>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                {menuItems.map(item => (
+                                    <div key={item.id} 
+                                         className="glass-card p-8 rounded-3xl cursor-pointer transform transition-all duration-500 hover:-translate-y-4 hover:shadow-2xl hover:shadow-purple-500/20 group relative overflow-hidden"
+                                         onClick={() => setCurrentView(item.id)}>
+                                        <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                                        <div className="text-7xl mb-6 group-hover:scale-110 transition-transform duration-500 origin-bottom-right">{item.icon}</div>
+                                        <h2 className="text-3xl font-bold mb-4">{item.title}</h2>
+                                        <p className="text-slate-400 text-lg leading-relaxed">{item.desc}</p>
+                                        <div className="mt-8 flex items-center text-sm font-bold tracking-widest uppercase text-slate-500 group-hover:text-white transition-colors">
+                                            הפעל סימולטור <span className="ml-2">→</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {currentView === 'fda' && <FDASimulator onBack={() => setCurrentView('menu')} />}
+                    {currentView === 'outlier' && <OutlierEffect onBack={() => setCurrentView('menu')} />}
+                    {currentView === 'research' && <ResearchBuilder onBack={() => setCurrentView('menu')} />}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
