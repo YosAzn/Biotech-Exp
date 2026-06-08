@@ -890,9 +890,11 @@
 
     <script>
         // Start completely clean of any mock/demo data as requested
-        let groups = [];
-        let reviews = [];
-        let activeGroupId = "";
+        // NOTE: var (not let) so these are window-backed — the Firebase module
+        // updates window.groups/window.reviews, and these must be the SAME binding.
+        var groups = [];
+        var reviews = [];
+        var activeGroupId = "";
         
         // local list builder for student names
         let tempStudentsList = [];
