@@ -1,6 +1,7 @@
 rules_version = '2';
 
 // Biotech Grading — Firestore security rules
+// Project: biotech-grading-edu  |  Location: me-west1 (Tel Aviv, single-region — permanent)
 // Data lives under: artifacts/{appId}/public/data/{groups|reviews}/{docId}
 // Any signed-in user (anonymous auth) may read/write within the app namespace.
 // This matches the app design (students submit peer reviews, teacher reads them).
