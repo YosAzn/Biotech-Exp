@@ -239,12 +239,18 @@
                         </h2>
                         <p class="text-xs text-slate-500 mt-1">בחר קבוצה כדי להזין את ציוני המחוון ולערוך את ציוני התלמידים הבודדים בקבוצה.</p>
                     </div>
-                    <!-- Active group filter dropdown -->
+                    <!-- Active group filter dropdown + edit/delete controls -->
                     <div class="flex items-center gap-2 w-full md:w-auto">
                         <label class="text-xs font-bold text-slate-700 whitespace-nowrap">קבוצה פעילה להערכה:</label>
-                        <select id="active-group-select" onchange="changeActiveGroup(this.value)" class="w-full md:w-64 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm font-bold focus:ring-emerald-500 focus:border-emerald-500">
+                        <select id="active-group-select" onchange="changeActiveGroup(this.value)" class="w-full md:w-56 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm font-bold focus:ring-emerald-500 focus:border-emerald-500">
                             <!-- Loaded Dynamically -->
                         </select>
+                        <button onclick="editActiveGroup()" title="ערוך שם / נושא קבוצה" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition">
+                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteActiveGroup()" title="מחק קבוצה" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -259,7 +265,7 @@
                             </h3>
                             <div class="text-left">
                                 <span class="text-xs text-slate-500 block">ציון מצגת קבוצתי</span>
-                                <span id="teacher-total-badge" class="text-2xl font-black text-emerald-600 mono-font">0/100</span>
+                                <span id="teacher-total-badge" class="text-2xl font-black text-emerald-600 mono-font">80/80</span>
                             </div>
                         </div>
 
@@ -270,13 +276,13 @@
                                 <div class="flex items-start gap-2 max-w-lg">
                                     <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">1</span>
                                     <div>
-                                        <h4 class="text-sm font-bold text-slate-800">הבנת הרקע המדעי (15 נק')</h4>
+                                        <h4 class="text-sm font-bold text-slate-800">הבנת הרקע המדעי (12 נק')</h4>
                                         <p class="text-[11px] text-slate-500">הסבר נכון וברור. קשר לוגי ישיר לשאלת המחקר.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5 self-end sm:self-center">
-                                    <input type="number" id="c-bg" min="0" max="15" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
-                                    <span class="text-xs text-slate-400">/ 15</span>
+                                    <input type="number" id="c-bg" min="0" max="12" value="12" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 12</span>
                                 </div>
                             </div>
 
@@ -285,13 +291,13 @@
                                 <div class="flex items-start gap-2 max-w-lg">
                                     <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">2</span>
                                     <div>
-                                        <h4 class="text-sm font-bold text-slate-800">שאלת מחקר והשערה (15 נק')</h4>
+                                        <h4 class="text-sm font-bold text-slate-800">שאלת מחקר והשערה (12 נק')</h4>
                                         <p class="text-[11px] text-slate-500">שאלת מחקר ברורה. השערה מנומקת ביולוגית (לא ניחוש).</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5 self-end sm:self-center">
-                                    <input type="number" id="c-hypothesis" min="0" max="15" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
-                                    <span class="text-xs text-slate-400">/ 15</span>
+                                    <input type="number" id="c-hypothesis" min="0" max="12" value="12" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 12</span>
                                 </div>
                             </div>
 
@@ -300,13 +306,13 @@
                                 <div class="flex items-start gap-2 max-w-lg">
                                     <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">3</span>
                                     <div>
-                                        <h4 class="text-sm font-bold text-slate-800">הבנת מהלך הניסוי והשיטות (20 נק')</h4>
+                                        <h4 class="text-sm font-bold text-slate-800">הבנת מהלך הניסוי והשיטות (16 נק')</h4>
                                         <p class="text-[11px] text-slate-500">הסבר טיפולים, ביקורת, חזרות, מדידות ושמירה על תנאים קבועים.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5 self-end sm:self-center">
-                                    <input type="number" id="c-methods" min="0" max="20" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
-                                    <span class="text-xs text-slate-400">/ 20</span>
+                                    <input type="number" id="c-methods" min="0" max="16" value="16" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 16</span>
                                 </div>
                             </div>
 
@@ -315,13 +321,13 @@
                                 <div class="flex items-start gap-2 max-w-lg">
                                     <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">4</span>
                                     <div>
-                                        <h4 class="text-sm font-bold text-slate-800">הצגת תוצאות חלקיות (20 נק')</h4>
+                                        <h4 class="text-sm font-bold text-slate-800">הצגת תוצאות חלקיות (16 נק')</h4>
                                         <p class="text-[11px] text-slate-500">גרף/טבלה מסודרים עם כותרות, צירים ברורים, יחידות והסבר מגמה.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5 self-end sm:self-center">
-                                    <input type="number" id="c-results" min="0" max="20" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
-                                    <span class="text-xs text-slate-400">/ 20</span>
+                                    <input type="number" id="c-results" min="0" max="16" value="16" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 16</span>
                                 </div>
                             </div>
 
@@ -330,13 +336,13 @@
                                 <div class="flex items-start gap-2 max-w-lg">
                                     <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">5</span>
                                     <div>
-                                        <h4 class="text-sm font-bold text-slate-800">פרשנות מדעית זהירה (15 נק')</h4>
+                                        <h4 class="text-sm font-bold text-slate-800">פרשנות מדעית זהירה (12 נק')</h4>
                                         <p class="text-[11px] text-slate-500">הבחנה בין תוצאה למסקנה. ללא הסקת יתר על RNA שטרם נמדד.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5 self-end sm:self-center">
-                                    <input type="number" id="c-caution" min="0" max="15" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
-                                    <span class="text-xs text-slate-400">/ 15</span>
+                                    <input type="number" id="c-caution" min="0" max="12" value="12" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 12</span>
                                 </div>
                             </div>
 
@@ -345,13 +351,13 @@
                                 <div class="flex items-start gap-2 max-w-lg">
                                     <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">6</span>
                                     <div>
-                                        <h4 class="text-sm font-bold text-slate-800">איכות ההצגה ועמידה בזמנים (10 נק')</h4>
+                                        <h4 class="text-sm font-bold text-slate-800">איכות ההצגה ועמידה בזמנים (8 נק')</h4>
                                         <p class="text-[11px] text-slate-500">דיבור ברור, שיתוף פעולה, שקופיות נקיות ועמידה בזמנים (7-10 דק').</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5 self-end sm:self-center">
-                                    <input type="number" id="c-presentation" min="0" max="10" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
-                                    <span class="text-xs text-slate-400">/ 10</span>
+                                    <input type="number" id="c-presentation" min="0" max="8" value="8" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 8</span>
                                 </div>
                             </div>
 
@@ -360,13 +366,13 @@
                                 <div class="flex items-start gap-2 max-w-lg">
                                     <span class="w-5 h-5 bg-emerald-200 text-emerald-800 text-[10px] font-black rounded-full flex items-center justify-center mt-0.5">7</span>
                                     <div>
-                                        <h4 class="text-sm font-bold text-slate-800">מענה לשאלות הכיתה והמורה (5 נק')</h4>
+                                        <h4 class="text-sm font-bold text-slate-800">מענה לשאלות הכיתה והמורה (4 נק')</h4>
                                         <p class="text-[11px] text-slate-500">מענה ענייני ומקצועי המעיד על הבנת העומק של הניסוי.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5 self-end sm:self-center">
-                                    <input type="number" id="c-qna" min="0" max="5" value="0" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
-                                    <span class="text-xs text-slate-400">/ 5</span>
+                                    <input type="number" id="c-qna" min="0" max="4" value="4" onchange="updateTeacherScore()" class="w-16 px-2 py-1 text-center font-bold border border-slate-200 rounded-lg text-sm bg-white">
+                                    <span class="text-xs text-slate-400">/ 4</span>
                                 </div>
                             </div>
                         </div>
@@ -392,7 +398,7 @@
                                 ציונים אינדיבידואליים לחברי הקבוצה
                             </h3>
                             <p class="text-[11px] text-slate-500 mt-1">
-                                ציוני התלמידים מבוססים על: ציון פרזנטציה קבוצתי (90%) + ציון איכות המשוב שלהם (10%) + התאמה/בונוס אישי של המורה.
+                                ציוני התלמידים מבוססים על: מחוון מורה קבוצתי (80%, ניתן להתאמה אישית) + ממוצע הערכת עמיתים (10%) + ציון איכות המשוב האישי (10%).
                             </p>
                             
                             <div id="individual-students-list-container" class="space-y-3 mt-3">
@@ -445,9 +451,9 @@
                             <tr class="bg-slate-100/50 text-slate-600 font-bold border-b border-slate-200">
                                 <th class="p-3">שם קבוצה</th>
                                 <th class="p-3">שם התלמיד</th>
-                                <th class="p-3">ציון פרזנטציה (90%)</th>
+                                <th class="p-3">מחוון מורה (80%)</th>
+                                <th class="p-3">משוב עמיתים (10%)</th>
                                 <th class="p-3">איכות משוב (10%)</th>
-                                <th class="p-3">התאמת מורה אישית</th>
                                 <th class="p-3">הגשות עמיתים</th>
                                 <th class="p-3 text-emerald-800 font-extrabold text-left">ציון סופי משוקלל</th>
                             </tr>
@@ -471,7 +477,7 @@
                 </h2>
                 <p class="text-xs sm:text-sm text-emerald-100 max-w-4xl leading-relaxed">
                     תלמיד/ה יקר/ה, מילוי הערכה זו נועד לעזור לכם לתרגל חשיבה ביקורתית מדעית עניינית. 
-                    <strong>עליך להעריך בדיוק 2 קבוצות שונות</strong> המציגות בכיתה (פרט לקבוצה שלך) כדי להשלים את חובתך.
+                    <strong>עליך להעריך את כל הקבוצות המציגות בכיתה (פרט לקבוצה שלך)</strong> כדי להשלים את חובתך.
                 </p>
             </div>
 
@@ -866,6 +872,12 @@
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'reviews', reviewId);
             await deleteDoc(docRef);
         };
+
+        window.deleteGroupFromCloud = async (groupId) => {
+            if (!firebaseInitialized) return;
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'groups', groupId);
+            await deleteDoc(docRef);
+        };
         
         window.clearCloudDatabase = async () => {
             if (!firebaseInitialized) return;
@@ -901,7 +913,7 @@
 
         // Active student submission values
         let currentStudentScores = {
-            q1: 5, q2: 5, q3: 5, q4: 5, q5: 5, q6: 5
+            q1: 0, q2: 0, q3: 0, q4: 0, q5: 0, q6: 0
         };
 
         window.onload = function() {
@@ -944,15 +956,15 @@
 
         function resetScoresInputs() {
             document.getElementById("eval-group-title").innerText = "אין קבוצות במערכת";
-            document.getElementById("c-bg").value = 0;
-            document.getElementById("c-hypothesis").value = 0;
-            document.getElementById("c-methods").value = 0;
-            document.getElementById("c-results").value = 0;
-            document.getElementById("c-caution").value = 0;
-            document.getElementById("c-presentation").value = 0;
-            document.getElementById("c-qna").value = 0;
-            
-            document.getElementById("teacher-total-badge").innerText = "0/100";
+            document.getElementById("c-bg").value = 12;
+            document.getElementById("c-hypothesis").value = 12;
+            document.getElementById("c-methods").value = 16;
+            document.getElementById("c-results").value = 16;
+            document.getElementById("c-caution").value = 12;
+            document.getElementById("c-presentation").value = 8;
+            document.getElementById("c-qna").value = 4;
+
+            document.getElementById("teacher-total-badge").innerText = "80/80";
             document.getElementById("peer-avg-stars").innerText = "0.0";
             document.getElementById("peer-count").innerText = "0";
             document.getElementById("peer-reviews-list").innerHTML = `
@@ -1100,8 +1112,8 @@
             tempStudentsList.push({
                 id: "student-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
                 name: name,
-                feedbackQuality: 100, // default evaluation
-                adjustment: 0 // default teacher offset
+                feedbackQuality: 80, // default = full feedback-quality on 80% scale
+                teacherOverride: null // null => use group rubric total (0-80); number => per-student override
             });
             input.value = "";
             renderBuilderChips();
@@ -1241,7 +1253,7 @@
                 name: name,
                 topic: topic || "מחקרי קסניה ביולוגיים",
                 students: [...tempStudentsList], // copy the individual student objects
-                teacherScores: { bg: 0, hypothesis: 0, methods: 0, results: 0, caution: 0, presentation: 0, qna: 0 }
+                teacherScores: { bg: 12, hypothesis: 12, methods: 16, results: 16, caution: 12, presentation: 8, qna: 4 }
             };
 
             groups.push(newG);
@@ -1264,6 +1276,133 @@
             document.getElementById("new-group-topic").value = "";
 
             showModal("הקבוצה נוספה בהצלחה!", `קבוצה בשם "${name}" עם ${newG.students.length} תלמידים הוגדרה במערכת.`, "check-circle", "bg-emerald-100 text-emerald-800");
+        }
+
+        // ===== Group edit / delete =====
+        async function editActiveGroup() {
+            const g = groups.find(group => group.id === activeGroupId);
+            if (!g) {
+                showModal("לא נבחרה קבוצה", "אנא בחר קבוצה פעילה לפני עריכה.", "alert-triangle", "bg-amber-100 text-amber-800");
+                return;
+            }
+            const newName = prompt("שם הקבוצה:", g.name);
+            if (newName === null) return; // cancelled
+            const trimmed = newName.trim();
+            if (!trimmed) {
+                showModal("שם לא תקין", "שם הקבוצה אינו יכול להיות ריק.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+            const newTopic = prompt("נושא המחקר:", g.topic || "");
+            g.name = trimmed;
+            if (newTopic !== null) g.topic = newTopic.trim();
+
+            saveLocalState();
+            if (window.firebaseInitialized && window.firebaseInitialized()) {
+                await window.saveGroupToCloud(g);
+            }
+            rebuildGroupDropdowns();
+            rebuildStudentReviewDropdown();
+            document.getElementById("eval-group-title").innerText = g.name;
+            renderClassTable();
+            renderIndividualGradingList();
+            updateStudentProgressWidget();
+            showModal("הקבוצה עודכנה", `שם הקבוצה עודכן ל"${g.name}".`, "check-circle", "bg-emerald-100 text-emerald-800");
+        }
+
+        async function deleteActiveGroup() {
+            const g = groups.find(group => group.id === activeGroupId);
+            if (!g) {
+                showModal("לא נבחרה קבוצה", "אנא בחר קבוצה פעילה לפני מחיקה.", "alert-triangle", "bg-amber-100 text-amber-800");
+                return;
+            }
+            if (!confirm(`האם למחוק לצמיתות את הקבוצה "${g.name}" וכל התלמידים שבה? המשובים שהתקבלו עבורה יימחקו גם הם.`)) return;
+
+            const removedId = g.id;
+            // Remove reviews targeting this group
+            const reviewsToDelete = reviews.filter(r => r.targetGroupId === removedId).map(r => r.id);
+            reviews = reviews.filter(r => r.targetGroupId !== removedId);
+            // Remove the group
+            groups = groups.filter(grp => grp.id !== removedId);
+
+            // Pick a new active group
+            activeGroupId = groups.length > 0 ? groups[0].id : "";
+
+            saveLocalState();
+            if (window.firebaseInitialized && window.firebaseInitialized()) {
+                await window.deleteGroupFromCloud(removedId);
+                for (const rid of reviewsToDelete) {
+                    await window.deleteReviewFromCloud(rid);
+                }
+            }
+
+            rebuildGroupDropdowns();
+            rebuildStudentReviewDropdown();
+            renderClassTable();
+            updateStudentProgressWidget();
+            if (groups.length > 0) {
+                changeActiveGroup(activeGroupId);
+            } else {
+                resetScoresInputs();
+                renderActiveGroupPeerReviews();
+                renderIndividualGradingList();
+            }
+            showModal("הקבוצה נמחקה", "הקבוצה והמשובים המשויכים אליה הוסרו מהמערכת.", "trash-2", "bg-rose-100 text-rose-800");
+        }
+
+        // ===== Per-student edit / delete (within active group) =====
+        async function renameStudent(studentId) {
+            const g = groups.find(group => group.id === activeGroupId);
+            if (!g) return;
+            const student = g.students.find(s => s.id === studentId);
+            if (!student) return;
+            const newName = prompt("שם התלמיד:", student.name);
+            if (newName === null) return;
+            const trimmed = newName.trim();
+            if (!trimmed) {
+                showModal("שם לא תקין", "שם התלמיד אינו יכול להיות ריק.", "alert-triangle", "bg-rose-100 text-rose-800");
+                return;
+            }
+            student.name = trimmed;
+            // Keep reviewer display name in sync on existing reviews authored by this student
+            reviews.forEach(r => { if (r.reviewerStudentId === studentId) r.reviewerName = trimmed; });
+
+            saveLocalState();
+            if (window.firebaseInitialized && window.firebaseInitialized()) {
+                await window.saveGroupToCloud(g);
+                for (const r of reviews.filter(rv => rv.reviewerStudentId === studentId)) {
+                    await window.saveReviewToCloud(r);
+                }
+            }
+            rebuildStudentReviewDropdown();
+            renderIndividualGradingList();
+            renderActiveGroupPeerReviews();
+            renderClassTable();
+            updateStudentProgressWidget();
+        }
+
+        async function deleteStudent(studentId) {
+            const g = groups.find(group => group.id === activeGroupId);
+            if (!g) return;
+            const student = g.students.find(s => s.id === studentId);
+            if (!student) return;
+            if (!confirm(`האם להסיר את התלמיד "${student.name}" מהקבוצה? המשובים שהוא הגיש יימחקו.`)) return;
+
+            g.students = g.students.filter(s => s.id !== studentId);
+            const reviewsToDelete = reviews.filter(r => r.reviewerStudentId === studentId).map(r => r.id);
+            reviews = reviews.filter(r => r.reviewerStudentId !== studentId);
+
+            saveLocalState();
+            if (window.firebaseInitialized && window.firebaseInitialized()) {
+                await window.saveGroupToCloud(g);
+                for (const rid of reviewsToDelete) {
+                    await window.deleteReviewFromCloud(rid);
+                }
+            }
+            rebuildStudentReviewDropdown();
+            renderIndividualGradingList();
+            renderActiveGroupPeerReviews();
+            renderClassTable();
+            updateStudentProgressWidget();
         }
 
         function changeActiveGroup(groupId, updateFields = true) {
@@ -1300,7 +1439,7 @@
             const qna = parseInt(document.getElementById("c-qna").value) || 0;
 
             const sum = bg + hyp + meth + res + caut + pres + qna;
-            document.getElementById("teacher-total-badge").innerText = `${sum}/100`;
+            document.getElementById("teacher-total-badge").innerText = `${sum}/80`;
 
             calculateWeightedScores();
         }
@@ -1310,13 +1449,13 @@
             if (!g) return;
 
             g.teacherScores = {
-                bg: Math.min(15, Math.max(0, parseInt(document.getElementById("c-bg").value) || 0)),
-                hypothesis: Math.min(15, Math.max(0, parseInt(document.getElementById("c-hypothesis").value) || 0)),
-                methods: Math.min(20, Math.max(0, parseInt(document.getElementById("c-methods").value) || 0)),
-                results: Math.min(20, Math.max(0, parseInt(document.getElementById("c-results").value) || 0)),
-                caution: Math.min(15, Math.max(0, parseInt(document.getElementById("c-caution").value) || 0)),
-                presentation: Math.min(10, Math.max(0, parseInt(document.getElementById("c-presentation").value) || 0)),
-                qna: Math.min(5, Math.max(0, parseInt(document.getElementById("c-qna").value) || 0))
+                bg: Math.min(12, Math.max(0, parseInt(document.getElementById("c-bg").value) || 0)),
+                hypothesis: Math.min(12, Math.max(0, parseInt(document.getElementById("c-hypothesis").value) || 0)),
+                methods: Math.min(16, Math.max(0, parseInt(document.getElementById("c-methods").value) || 0)),
+                results: Math.min(16, Math.max(0, parseInt(document.getElementById("c-results").value) || 0)),
+                caution: Math.min(12, Math.max(0, parseInt(document.getElementById("c-caution").value) || 0)),
+                presentation: Math.min(8, Math.max(0, parseInt(document.getElementById("c-presentation").value) || 0)),
+                qna: Math.min(4, Math.max(0, parseInt(document.getElementById("c-qna").value) || 0))
             };
 
             saveLocalState();
@@ -1374,10 +1513,10 @@
                 return;
             }
 
-            // Calculations
-            const tPresentationScore = (g.teacherScores.bg || 0) + (g.teacherScores.hypothesis || 0) + (g.teacherScores.methods || 0) + 
-                                       (g.teacherScores.results || 0) + (g.teacherScores.caution || 0) + (g.teacherScores.presentation || 0) + 
-                                       (g.teacherScores.qna || 0);
+            // Calculations — rubric is now out of 80 (sum of criteria)
+            const tRubricTotal = (g.teacherScores.bg || 0) + (g.teacherScores.hypothesis || 0) + (g.teacherScores.methods || 0) +
+                                 (g.teacherScores.results || 0) + (g.teacherScores.caution || 0) + (g.teacherScores.presentation || 0) +
+                                 (g.teacherScores.qna || 0);
 
             const groupReviews = reviews.filter(r => r.targetGroupId === g.id);
             let peerAvgPct = 0;
@@ -1389,17 +1528,21 @@
                 peerAvgPct = (sum / (groupReviews.length * 30)) * 100;
             }
 
-            // Combined Presentation Component (90% of final score if calculated relative to 90 points)
-            // presentation group component = 80% teacher + 10% peer = 90 points max
-            const groupPresentationComponent = ((tPresentationScore / 100) * 80) + ((peerAvgPct / 100) * 10);
+            // Peer component: 10 points max (10%)
+            const peerComponent = (peerAvgPct / 100) * 10;
 
             g.students.forEach(s => {
                 const writtenReviews = reviews.filter(r => r.reviewerStudentId === s.id);
                 const submissionCount = writtenReviews.length;
 
-                // Student final score
-                const feedbackComponent = ((s.feedbackQuality || 0) / 100) * 10; // max 10 points
-                let finalScore = groupPresentationComponent + feedbackComponent + (s.adjustment || 0);
+                // Teacher rubric portion for THIS student: override (0-80) if set, else group total
+                const teacherPortion = (s.teacherOverride === null || s.teacherOverride === undefined)
+                    ? tRubricTotal : s.teacherOverride;
+                // Feedback quality: stored 0-80, contributes 10 points (10%)
+                const fq = (s.feedbackQuality === undefined || s.feedbackQuality === null) ? 80 : s.feedbackQuality;
+                const feedbackComponent = (fq / 80) * 10; // max 10 points
+
+                let finalScore = teacherPortion + peerComponent + feedbackComponent;
                 finalScore = Math.max(0, Math.min(100, finalScore)); // clamp between 0 and 100
 
                 const card = document.createElement("div");
@@ -1409,48 +1552,54 @@
                         <span class="font-extrabold text-slate-800 text-sm flex items-center gap-1">
                             <i data-lucide="user" class="w-4 h-4 text-emerald-600"></i>
                             ${s.name}
+                            <button onclick="renameStudent('${s.id}')" title="שנה שם תלמיד" class="p-1 text-slate-400 hover:text-emerald-600 transition no-print">
+                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button onclick="deleteStudent('${s.id}')" title="הסר תלמיד" class="p-1 text-slate-400 hover:text-rose-600 transition no-print">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
                         </span>
                         <div class="text-left">
                             <span class="text-[9px] text-slate-400 block uppercase">ציון סופי מחושב</span>
                             <span class="text-base font-black text-emerald-700 mono-font">${finalScore.toFixed(1)} / 100</span>
                         </div>
                     </div>
-                    
+
                     <div class="grid grid-cols-2 gap-3 text-xs">
                         <div>
-                            <span class="text-[10px] text-slate-500 font-semibold block">קבוצת פראזנטציה (90%):</span>
-                            <span class="font-bold text-slate-700">${groupPresentationComponent.toFixed(1)} / 90</span>
+                            <span class="text-[10px] text-slate-500 font-semibold block">מחוון מורה (80%):</span>
+                            <span class="font-bold text-slate-700">${teacherPortion.toFixed(1)} / 80</span>
                         </div>
                         <div>
                             <span class="text-[10px] text-slate-500 font-semibold block">הגשות עמיתים שביצע:</span>
-                            <span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${submissionCount >= 2 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                                ${submissionCount}/2 קבוצות
+                            <span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${submissionCount >= peerTarget() ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                ${submissionCount}/${peerTarget()} קבוצות
                             </span>
                         </div>
                     </div>
 
-                    <!-- Individual Feedback Quality Grade -->
+                    <!-- Individual Feedback Quality Grade (0-80, 10% weight) -->
                     <div class="space-y-1">
                         <div class="flex justify-between text-[11px] font-bold text-slate-700">
                             <span>ציון איכות משוב (10%):</span>
-                            <span class="text-purple-700"><span id="ind-fq-val-${s.id}">${s.feedbackQuality || 100}</span>%</span>
+                            <span class="text-purple-700"><span id="ind-fq-val-${s.id}">${fq}</span>/80</span>
                         </div>
-                        <input type="range" min="0" max="100" value="${s.feedbackQuality || 100}" 
-                            oninput="document.getElementById('ind-fq-val-${s.id}').innerText = this.value; updateIndividualFeedbackScore('${s.id}', this.value)" 
+                        <input type="range" min="0" max="80" value="${fq}"
+                            oninput="document.getElementById('ind-fq-val-${s.id}').innerText = this.value; updateIndividualFeedbackScore('${s.id}', this.value)"
                             class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
                     </div>
 
-                    <!-- Adjustment Teacher Offset -->
+                    <!-- Per-student teacher-rubric override (0-80) -->
                     <div class="space-y-1">
                         <div class="flex justify-between text-[11px] font-bold text-slate-700">
-                            <span>התאמת ציון מורה אישית (Adjustment Offset):</span>
-                            <span class="${(s.adjustment || 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}">
-                                ${(s.adjustment || 0) >= 0 ? '+' : ''}${s.adjustment || 0} נק'
+                            <span>התאמת מורה אישית (מחוון 80%):</span>
+                            <span class="text-emerald-600">
+                                <span id="ind-adj-val-${s.id}">${teacherPortion}</span>/80
                             </span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <input type="range" min="-15" max="15" value="${s.adjustment || 0}" 
-                                oninput="updateIndividualAdjustment('${s.id}', this.value)" 
+                            <input type="range" min="0" max="80" value="${teacherPortion}"
+                                oninput="document.getElementById('ind-adj-val-${s.id}').innerText = this.value; updateIndividualAdjustment('${s.id}', this.value)"
                                 class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
                         </div>
                     </div>
@@ -1476,12 +1625,17 @@
             }
         }
 
+        // Expected number of peer-review submissions per student = (groups − 1), min 0
+        function peerTarget() {
+            return Math.max(0, groups.length - 1);
+        }
+
         async function updateIndividualAdjustment(studentId, value) {
             const g = groups.find(group => group.id === activeGroupId);
             if (!g) return;
             const student = g.students.find(s => s.id === studentId);
             if (student) {
-                student.adjustment = parseInt(value);
+                student.teacherOverride = parseInt(value);
                 saveLocalState();
                 if (window.firebaseInitialized && window.firebaseInitialized()) {
                     await window.saveGroupToCloud(g);
@@ -1500,10 +1654,11 @@
         }
 
         function calcStudentRowScore(groupObj, studentObj) {
-            const tScore = (groupObj.teacherScores.bg || 0) + (groupObj.teacherScores.hypothesis || 0) + (groupObj.teacherScores.methods || 0) + 
-                           (groupObj.teacherScores.results || 0) + (groupObj.teacherScores.caution || 0) + (groupObj.teacherScores.presentation || 0) + 
-                           (groupObj.teacherScores.qna || 0);
-            
+            // Teacher rubric total (out of 80)
+            const tRubricTotal = (groupObj.teacherScores.bg || 0) + (groupObj.teacherScores.hypothesis || 0) + (groupObj.teacherScores.methods || 0) +
+                                 (groupObj.teacherScores.results || 0) + (groupObj.teacherScores.caution || 0) + (groupObj.teacherScores.presentation || 0) +
+                                 (groupObj.teacherScores.qna || 0);
+
             const groupReviews = reviews.filter(r => r.targetGroupId === groupObj.id);
             let peerAvgPct = 0;
             if (groupReviews.length > 0) {
@@ -1514,10 +1669,14 @@
                 peerAvgPct = (totalLikertScore / (groupReviews.length * 30)) * 100;
             }
 
-            const presentationComponent = ((tScore / 100) * 80) + ((peerAvgPct / 100) * 10);
-            const feedbackComponent = ((studentObj.feedbackQuality || 100) / 100) * 10;
-            
-            const final = presentationComponent + feedbackComponent + (studentObj.adjustment || 0);
+            // Teacher portion: per-student override (0-80) if set, else group rubric total
+            const teacherPortion = (studentObj.teacherOverride === null || studentObj.teacherOverride === undefined)
+                ? tRubricTotal : studentObj.teacherOverride;
+            const peerComponent = (peerAvgPct / 100) * 10; // 10 points max
+            const fq = (studentObj.feedbackQuality === undefined || studentObj.feedbackQuality === null) ? 80 : studentObj.feedbackQuality;
+            const feedbackComponent = (fq / 80) * 10; // 10 points max
+
+            const final = teacherPortion + peerComponent + feedbackComponent;
             return Math.max(0, Math.min(100, final)).toFixed(1);
         }
 
@@ -1660,9 +1819,9 @@
             groups.forEach(g => {
                 if (!g.students || g.students.length === 0) return;
 
-                const tPresentationScore = (g.teacherScores.bg || 0) + (g.teacherScores.hypothesis || 0) + (g.teacherScores.methods || 0) + 
-                                           (g.teacherScores.results || 0) + (g.teacherScores.caution || 0) + (g.teacherScores.presentation || 0) + 
-                                           (g.teacherScores.qna || 0);
+                const tRubricTotal = (g.teacherScores.bg || 0) + (g.teacherScores.hypothesis || 0) + (g.teacherScores.methods || 0) +
+                                     (g.teacherScores.results || 0) + (g.teacherScores.caution || 0) + (g.teacherScores.presentation || 0) +
+                                     (g.teacherScores.qna || 0);
 
                 const groupReviews = reviews.filter(r => r.targetGroupId === g.id);
                 let peerAvgPct = 0;
@@ -1674,25 +1833,29 @@
                     peerAvgPct = (sum / (groupReviews.length * 30)) * 100;
                 }
 
-                const groupPresentationComponent = ((tPresentationScore / 100) * 80) + ((peerAvgPct / 100) * 10);
+                const peerComponent = (peerAvgPct / 100) * 10; // 10 points max
+                const target = peerTarget();
 
                 g.students.forEach((s, idx) => {
                     const writtenReviews = reviews.filter(r => r.reviewerStudentId === s.id);
                     const submissionCount = writtenReviews.length;
                     const finalWeighted = calcStudentRowScore(g, s);
 
+                    const teacherPortion = (s.teacherOverride === null || s.teacherOverride === undefined) ? tRubricTotal : s.teacherOverride;
+                    const fq = (s.feedbackQuality === undefined || s.feedbackQuality === null) ? 80 : s.feedbackQuality;
+
                     const tr = document.createElement("tr");
                     tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
-                    
+
                     tr.innerHTML = `
                         <td class="p-3 font-bold text-emerald-900 ${idx === 0 ? 'bg-slate-50/20' : ''}">${idx === 0 ? g.name : '<span class="text-slate-300">"</span>'}</td>
                         <td class="p-3 text-slate-800 font-semibold">${s.name}</td>
-                        <td class="p-3 text-slate-700 font-medium">${groupPresentationComponent.toFixed(1)} / 90</td>
-                        <td class="p-3 text-slate-700">${s.feedbackQuality || 100}%</td>
-                        <td class="p-3 font-bold ${s.adjustment >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${s.adjustment >= 0 ? '+' : ''}${s.adjustment || 0} נק'</td>
+                        <td class="p-3 text-slate-700 font-medium">${teacherPortion.toFixed(1)} / 80</td>
+                        <td class="p-3 text-slate-700">${peerComponent.toFixed(1)} / 10</td>
+                        <td class="p-3 text-slate-700">${fq} / 80</td>
                         <td class="p-3">
-                            <span class="px-2 py-0.5 rounded-full text-xs font-bold ${submissionCount >= 2 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                                ${submissionCount}/2
+                            <span class="px-2 py-0.5 rounded-full text-xs font-bold ${submissionCount >= target ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                ${submissionCount}/${target}
                             </span>
                         </td>
                         <td class="p-3 text-left font-black text-emerald-800 text-base mono-font">${finalWeighted} / 100</td>
@@ -1807,7 +1970,7 @@
             document.getElementById("peer-improvement").value = "";
             
             // Reset state
-            currentStudentScores = { q1: 5, q2: 5, q3: 5, q4: 5, q5: 5, q6: 5 };
+            currentStudentScores = { q1: 0, q2: 0, q3: 0, q4: 0, q5: 0, q6: 0 };
             renderLikertStars();
             updateStudentProgressWidget();
 
@@ -1828,20 +1991,30 @@
 
             const studentReviews = reviews.filter(r => r.reviewerStudentId === reviewerStudentId);
             const count = studentReviews.length;
+            const target = peerTarget(); // = groups.length - 1 (min 0)
 
-            if (count === 0) {
+            if (target === 0) {
+                widget.innerHTML = `
+                    <div class="flex items-center justify-center gap-1.5 text-slate-500 text-xs font-bold">
+                        <i data-lucide="info" class="w-4.5 h-4.5"></i>
+                        אין קבוצות אחרות להערכה כרגע.
+                    </div>
+                `;
+                if (count > 0) pdfBtn.classList.remove("hidden");
+                else pdfBtn.classList.add("hidden");
+            } else if (count === 0) {
                 widget.innerHTML = `
                     <div class="flex items-center justify-center gap-1.5 text-amber-700 text-xs font-bold">
                         <i data-lucide="circle" class="w-4.5 h-4.5"></i>
-                        0/2 קבוצות הוערכו. נותרו עוד 2 הגשות.
+                        0/${target} קבוצות הוערכו. נותרו עוד ${target} הגשות.
                     </div>
                 `;
                 pdfBtn.classList.add("hidden");
-            } else if (count === 1) {
+            } else if (count < target) {
                 widget.innerHTML = `
                     <div class="flex items-center justify-center gap-1.5 text-blue-700 text-xs font-bold">
                         <i data-lucide="pie-chart" class="w-4.5 h-4.5 animate-pulse"></i>
-                        1/2 קבוצות הוערכו. הגש עוד קבוצה אחת!
+                        ${count}/${target} קבוצות הוערכו. נותרו עוד ${target - count} הגשות!
                     </div>
                 `;
                 pdfBtn.classList.add("hidden");
@@ -1849,10 +2022,10 @@
                 widget.innerHTML = `
                     <div class="flex items-center justify-center gap-1.5 text-emerald-800 text-xs font-bold">
                         <i data-lucide="check-circle" class="w-4.5 h-4.5 text-emerald-600"></i>
-                        2/2 קבוצות הוערכו. עמדת במשימה!
+                        ${count}/${target} קבוצות הוערכו. עמדת במשימה!
                     </div>
                 `;
-                // Show PDF download button when at least 2 submissions are completed
+                // Show PDF download button when the target number of submissions is reached
                 pdfBtn.classList.remove("hidden");
             }
             lucide.createIcons();
@@ -1987,7 +2160,7 @@
                             </tr>
                             <tr>
                                 <td style="width: 50%; padding: 4px 0;"><strong>תאריך הפקת דוח:</strong> ${new Date().toLocaleDateString('he-IL')}</td>
-                                <td style="width: 50%; padding: 4px 0;"><strong>מצב משימה:</strong> ✅ הושלמו 2 הגשות כנדרש</td>
+                                <td style="width: 50%; padding: 4px 0;"><strong>מצב משימה:</strong> ✅ הושלמו ${studentReviews.length}/${Math.max(0, groups.length - 1)} הגשות</td>
                             </tr>
                         </table>
                     </div>
