@@ -55,14 +55,18 @@
             </div>
             
             <!-- Interface View Switcher (Teacher vs Student) -->
-            <div class="flex bg-emerald-950/60 p-1.5 rounded-xl border border-emerald-700/50">
-                <button onclick="switchView('teacher')" id="tab-teacher" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-emerald-500 text-white shadow">
-                    <i data-lucide="graduation-cap" class="w-4 h-4"></i>
-                    ממשק מורה ומנהל
-                </button>
-                <button onclick="switchView('student')" id="tab-student" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 text-emerald-300 hover:text-white">
+            <div class="flex items-center bg-emerald-950/60 p-1.5 rounded-xl border border-emerald-700/50">
+                <button onclick="switchView('student')" id="tab-student" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-emerald-500 text-white shadow">
                     <i data-lucide="users" class="w-4 h-4"></i>
                     ממשק הגשת תלמיד (עמיתים)
+                </button>
+                <button onclick="switchView('teacher')" id="tab-teacher" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 text-emerald-300 hover:text-white">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                    ממשק מורה ומנהל
+                </button>
+                <button onclick="lockTeacher()" id="tab-lock" class="hidden items-center gap-1 px-3 py-2 mr-1 rounded-lg text-xs font-bold text-amber-300 hover:text-white transition-all duration-200" title="נעל וחזור לממשק תלמיד">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    נעל
                 </button>
             </div>
         </div>
@@ -129,7 +133,7 @@
         </div>
 
         <!-- VIEW: TEACHER -->
-        <div id="view-teacher" class="space-y-6">
+        <div id="view-teacher" class="space-y-6 hidden">
             
             <!-- Connection Status Banner -->
             <div id="connection-status-banner" class="bg-slate-800 text-slate-300 text-xs px-4 py-2 rounded-xl flex items-center justify-between no-print shadow-inner border border-slate-700">
@@ -457,7 +461,7 @@
         </div>
 
         <!-- VIEW: STUDENT -->
-        <div id="view-student" class="hidden space-y-6">
+        <div id="view-student" class="space-y-6">
             
             <!-- Student Form Banner -->
             <div class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white rounded-2xl p-6 shadow-xs">
@@ -915,6 +919,9 @@
             } else {
                 resetScoresInputs();
             }
+
+            // ברירת מחדל: כניסה אוטומטית לממשק התלמיד (ממשק המורה מאחורי קוד)
+            switchView('student');
         };
 
         function saveLocalState() {
@@ -967,8 +974,15 @@
         }
 
         function switchView(viewName) {
+            // 🔒 שער כניסה: ממשק המורה דורש קוד. ממשק התלמיד פתוח לכולם.
+            if (viewName === 'teacher' && !window.__teacherUnlocked) {
+                openTeacherGate();
+                return;
+            }
+
             const btnTeacher = document.getElementById("tab-teacher");
             const btnStudent = document.getElementById("tab-student");
+            const btnLock = document.getElementById("tab-lock");
             const divTeacher = document.getElementById("view-teacher");
             const divStudent = document.getElementById("view-student");
 
@@ -977,11 +991,13 @@
                 divStudent.classList.add('hidden');
                 btnTeacher.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-emerald-500 text-white shadow";
                 btnStudent.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 text-emerald-300 hover:text-white";
+                if (btnLock) { btnLock.classList.remove('hidden'); btnLock.classList.add('flex'); }
                 renderClassTable();
                 if (activeGroupId) {
                     changeActiveGroup(activeGroupId, false);
                 }
             } else {
+                if (btnLock) { btnLock.classList.add('hidden'); btnLock.classList.remove('flex'); }
                 divTeacher.classList.add('hidden');
                 divStudent.classList.remove('hidden');
                 btnStudent.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-emerald-500 text-white shadow";
@@ -990,6 +1006,66 @@
                 updateStudentProgressWidget();
             }
         }
+
+        /* =====================================================================
+           🔑 שער כניסת מורה — קוד הגישה
+           לשינוי הקוד: ערוך את השורה הבאה בלבד (בין הגרשיים).
+           ===================================================================== */
+        const TEACHER_CODE = "biotech2026";
+
+        window.__teacherUnlocked = sessionStorage.getItem('grademe_teacher') === '1';
+
+        function openTeacherGate() {
+            let m = document.getElementById('teacher-gate');
+            if (!m) {
+                m = document.createElement('div');
+                m.id = 'teacher-gate';
+                m.className = 'fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center z-[100]';
+                m.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-2xl p-8 w-[90%] max-w-sm text-center">
+                        <div class="text-4xl mb-3">🔒</div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-1">כניסת מורה / מנהל</h3>
+                        <p class="text-sm text-slate-500 mb-5">הזן קוד גישה כדי להיכנס לממשק הניהול.</p>
+                        <input id="teacher-gate-input" type="password" placeholder="קוד גישה"
+                            class="w-full text-center px-4 py-3 border-2 border-slate-200 rounded-xl mb-2 focus:outline-none focus:border-emerald-500 text-lg" />
+                        <p id="teacher-gate-err" class="text-rose-600 text-xs h-4 mb-2"></p>
+                        <div class="flex gap-2">
+                            <button onclick="closeTeacherGate()" class="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">ביטול</button>
+                            <button onclick="submitTeacherGate()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm">כניסה</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(m);
+                m.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') submitTeacherGate();
+                    if (e.key === 'Escape') closeTeacherGate();
+                });
+            }
+            m.classList.remove('hidden');
+            const inp = document.getElementById('teacher-gate-input');
+            inp.value = '';
+            document.getElementById('teacher-gate-err').innerText = '';
+            setTimeout(() => inp.focus(), 50);
+        }
+        function closeTeacherGate() {
+            const m = document.getElementById('teacher-gate');
+            if (m) m.classList.add('hidden');
+        }
+        function submitTeacherGate() {
+            const val = document.getElementById('teacher-gate-input').value;
+            if (val === TEACHER_CODE) {
+                window.__teacherUnlocked = true;
+                sessionStorage.setItem('grademe_teacher', '1');
+                closeTeacherGate();
+                switchView('teacher');
+            } else {
+                document.getElementById('teacher-gate-err').innerText = 'קוד שגוי, נסה שוב';
+            }
+        }
+        window.lockTeacher = function() {
+            window.__teacherUnlocked = false;
+            sessionStorage.removeItem('grademe_teacher');
+            switchView('student');
+        };
 
         function toggleGuidelines() {
             const panel = document.getElementById("guidelines-panel");
