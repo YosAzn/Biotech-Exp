@@ -750,7 +750,16 @@
 
         // Global variables provided by system
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'biotech-evaluation-2026';
-        const rawConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+        // Firebase web config (public by design — security is enforced via Firestore rules + auth)
+        const __DEFAULT_FIREBASE_CONFIG = JSON.stringify({
+            apiKey: "AIzaSyAEGHxVDFCLMkNXSKA4q8BskSn9w2FzJN4",
+            authDomain: "biotech-grading-edu.firebaseapp.com",
+            projectId: "biotech-grading-edu",
+            storageBucket: "biotech-grading-edu.firebasestorage.app",
+            messagingSenderId: "1063064294532",
+            appId: "1:1063064294532:web:5e2b0950a8506eb896ded1"
+        });
+        const rawConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : __DEFAULT_FIREBASE_CONFIG;
         
         let db = null;
         let auth = null;
